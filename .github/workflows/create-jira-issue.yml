@@ -14,6 +14,8 @@ jobs:
           JIRA_BASE_URL: 'https://autoever3.atlassian.net'
           JIRA_API_TOKEN: 'ATATT3xFfGF0JU3YZ-q4SQPpapfxJc8DTZOj26U0v751QSw--EBlnSNSeHZ2j8ukf2GFenbbJIiAxCngmT31d5G-lev88A1oLutAtDFI7g0MnyJOzrDk4wgk5y5bqlxnXO5sz_1ll564VM7hyO8x7xn12PN3WjPAFzfDfrn5ePUkBAAAPtjTmWA=C1187AEB'
           JIRA_USER_EMAIL: 'tlsxodnjs147@gmail.com'
+        runs:
+          using: 'node20'
 
       - name: Checkout main code
         uses: actions/checkout@v4
