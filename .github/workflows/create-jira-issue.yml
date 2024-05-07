@@ -16,7 +16,7 @@ jobs:
           JIRA_USER_EMAIL: 'tlsxodnjs147@gmail.com'
 
       - name: Checkout main code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: main
 
@@ -60,7 +60,7 @@ jobs:
         run: echo "Jira Issue ${{ steps.issue-parser.outputs.parentKey }}/${{ steps.create.outputs.issue }} was created"
 
       - name: Checkout develop code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: develop
 
