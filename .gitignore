@@ -1,0 +1,9 @@
+Base_Project/.cproject
+Base_Project/.project
+*.d
+*.o
+*.src
+*.elf
+*.hex
+*.map
+*.mdf
