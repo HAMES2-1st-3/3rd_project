@@ -1,7 +1,7 @@
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
-#include "Driver_Stm.h"
+#include <Device_driver/Driver_Stm.h>
 #include "IfxPort.h"
 #include "IfxPort_PinMap.h"
 
@@ -57,7 +57,10 @@ void STM_Int0Handler(void)
     {
         stSchedulingInfo.u8nuScheduling10msFlag = 1u;
     }
-
+    if(u32nuCounter1ms % 50 == 0u)
+    {
+        stSchedulingInfo.u8nuScheduling50msFlag = 1u;
+    }
     if((u32nuCounter1ms % 100) == 0u)
     {
         stSchedulingInfo.u8nuScheduling100msFlag = 1u;

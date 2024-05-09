@@ -1,5 +1,5 @@
 /**********************************************************************************************************************
- * \file Driver_encoder.c
+ * \file Driver_ASP.h
  * \copyright Copyright (C) Infineon Technologies AG 2019
  * 
  * Use of this file is subject to the terms of use agreed between (i) you or the company in which ordinary course of 
@@ -25,134 +25,43 @@
  * IN THE SOFTWARE.
  *********************************************************************************************************************/
 
+#ifndef DRIVER_DEVICE_DRIVER_DRIVER_SERIALPLOTTER_H_
+#define DRIVER_DEVICE_DRIVER_DRIVER_SERIALPLOTTER_H_
 
 /*********************************************************************************************************************/
 /*-----------------------------------------------------Includes------------------------------------------------------*/
-#include <Driver_encoder.h>
-
-
-#include "IfxCpu_Irq.h"
-
+#include "Ifx_Types.h"
 
 /*********************************************************************************************************************/
 
 /*********************************************************************************************************************/
 /*------------------------------------------------------Macros-------------------------------------------------------*/
+#define USB_UART_MAX_PRINT_SIZE (255)
+#define VAR_MONITORING_STRING_SIZE (50)
+
+
+
 /*********************************************************************************************************************/
 
 /*********************************************************************************************************************/
 /*-------------------------------------------------Global variables--------------------------------------------------*/
-sint32 encoder_data = 0;  // 48 per rotate
-
 /*********************************************************************************************************************/
 
+/*********************************************************************************************************************/
+/*-------------------------------------------------Data Structures---------------------------------------------------*/
+/*********************************************************************************************************************/
+ 
 /*********************************************************************************************************************/
 /*--------------------------------------------Private Variables/Constants--------------------------------------------*/
 /*********************************************************************************************************************/
 
 /*********************************************************************************************************************/
 /*------------------------------------------------Function Prototypes------------------------------------------------*/
-/*********************************************************************************************************************/
+void USB_printf(pchar format,...);
+
+void USB_print_string(char *str, uint32 max_len);
 
 /*********************************************************************************************************************/
-/*---------------------------------------------Function Implementations----------------------------------------------*/
-
-IFX_INTERRUPT(ENCODER_CHA_ISR, 0, ISR_PRIORITY_ENCODER_CHA);
-void ENCODER_CHA_ISR(void){
-    if(IfxPort_getPinState(ENCODER_CHA)) { // rising edge triggered
-        if(IfxPort_getPinState(ENCODER_CHB)) {
-            encoder_data--; // 2 of figure (-)
-        } else {
-            encoder_data++; // 1 of figure (+)
-        }
-    } else { // falling edge triggered
-        if(IfxPort_getPinState(ENCODER_CHB)) {
-            encoder_data++; // 3 of figure (+)
-        } else {
-            encoder_data--; // 4 of figure (-)
-        }
-    }
-}
-
-IFX_INTERRUPT(ENCODER_CHB_ISR, 0, ISR_PRIORITY_ENCODER_CHB);
-void ENCODER_CHB_ISR(void){
-    if(IfxPort_getPinState(ENCODER_CHA)) { // rising edge triggered
-        if(IfxPort_getPinState(ENCODER_CHB)) {
-            encoder_data++; // 5 of figure(+)
-        } else {
-            encoder_data--; // 8 of figure(-)
-        }
-    } else { // falling edge triggered
-        if(IfxPort_getPinState(ENCODER_CHB)) {
-            encoder_data--; // 6 of figure(-)
-        } else {
-            encoder_data++; // 7 of figure(+)
-        }
-    }
-}
 
 
-void encoder_init(void){
-    //ERU
-    //SCU : system Control Unit
-    SCU_EICR1.U &= ~(0x7 << EXIS0_IDX);
-    SCU_EICR1.U |= 0x1 << EXIS0_IDX;
-
-    SCU_EICR1.U |= 1 << FEN0_IDX;
-    SCU_EICR1.U |= 1 << REN0_IDX;
-    SCU_EICR1.U |= 1 << EIEN0_IDX;
-
-    SCU_EICR1.U &= ~(0x7 << INP0_IDX);
-
-    SCU_IGCR0.U &= ~(0x3 << IGP0_IDX);
-    SCU_IGCR0.U |= 0x1 << IGP0_IDX;
-
-    //SRC : Service Request Control
-    SRC_SCU_SCU_ERU0.U &= ~0xFF;
-    SRC_SCU_SCU_ERU0.U |= ISR_PRIORITY_ENCODER_CHB;
-
-    SRC_SCU_SCU_ERU0.U |= 1 << SRE_IDX;
-    SRC_SCU_SCU_ERU0.U &= ~(0x3 << TOS_IDX);
-
-    //============================================//
-
-    SCU_EICR1.U &= ~(0x7 << EXIS1_IDX);
-    SCU_EICR1.U |= 0x2 << EXIS1_IDX;
-
-    SCU_EICR1.U |= 1 << FEN1_IDX;
-    SCU_EICR1.U |= 1 << REN1_IDX;
-    SCU_EICR1.U |= 1 << EIEN1_IDX;
-
-    SCU_EICR1.U &= ~(0x7 << INP1_IDX);
-    SCU_EICR1.U |= 0x1 << INP1_IDX;
-
-    SCU_IGCR0.U &= ~(0x3 << IGP1_IDX);
-    SCU_IGCR0.U |= 0x1 << IGP1_IDX;
-
-    //SRC : Service Request Control
-    SRC_SCU_SCU_ERU1.U &= ~0xFF;
-    SRC_SCU_SCU_ERU1.U |= ISR_PRIORITY_ENCODER_CHA;
-
-    SRC_SCU_SCU_ERU1.U |= 1 << SRE_IDX;
-    SRC_SCU_SCU_ERU1.U &= ~(0x3 << TOS_IDX);
-}
-
-
-sint32 encoder_get_rawdata() { // 48/rotate
-    return encoder_data;
-}
-
-sint32 encoder_get_deci_degrees() { // 48/rotate -> 3600/rotate
-    return encoder_data * 75;
-}
-
-float32 encoder_get_degrees() { // 48/rotate -> 360'/rotate
-    return encoder_data * 7.5;
-}
-
-float32 encoder_get_radians() { // 48/rotate -> 2*PI/rotate
-    return encoder_data * PI / 24; // encoder_data * 7.5 * 2 * PI / 360;
-}
-
-
-/*********************************************************************************************************************/
+#endif /* DRIVER_DEVICE_DRIVER_DRIVER_SERIALPLOTTER_H_ */

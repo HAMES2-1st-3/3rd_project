@@ -29,7 +29,10 @@ RM := rm -rf
 -include Libraries/iLLD/TC27D/Tricore/Asclin/Asc/subdir.mk
 -include Libraries/Service/CpuGeneric/StdIf/subdir.mk
 -include Libraries/Infra/Platform/Tricore/Compilers/subdir.mk
+-include Device_driver/subdir.mk
+-include Control/subdir.mk
 -include Configurations/Debug/subdir.mk
+-include App/subdir.mk
 -include subdir.mk
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(strip $(C++_DEPS)),)

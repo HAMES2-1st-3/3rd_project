@@ -1,7 +1,7 @@
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
-#include "AppMode_Init.h"
+#include <Device_driver/Driver_Watchdog.h>
 
 /***********************************************************************/
 /*Define*/ 
@@ -10,6 +10,7 @@
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
+
 
 /***********************************************************************/
 /*Static Function Prototype*/ 
@@ -24,15 +25,9 @@
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
-void Unit_ModeInit(ModeInfo* pModeInfo)
+void Driver_Watchdog_Init(void)
 {
-    pModeInfo->u32nuModeCnt++;
-
-    if(pModeInfo->u8nuTestModeTrigger == 1u)
-    {
-        pModeInfo->enuCurMode = IDLE_MODE;
-        pModeInfo->u32nuModeCnt = 0u;
-    }    
+    IfxScuWdt_disableCpuWatchdog(IfxScuWdt_getCpuWatchdogPassword());
+    IfxScuWdt_disableSafetyWatchdog(IfxScuWdt_getSafetyWatchdogPassword());
 }
-
 

@@ -24,8 +24,11 @@ SECONDARY_SIZE :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-. \
+App \
 Configurations/Debug \
+Control \
+. \
+Device_driver \
 Libraries/Infra/Platform/Tricore/Compilers \
 Libraries/Service/CpuGeneric/StdIf \
 Libraries/iLLD/TC27D/Tricore/Asclin/Asc \

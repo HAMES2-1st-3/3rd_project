@@ -4,68 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../AppMode.c \
-../AppMode_Error.c \
-../AppMode_Idle.c \
-../AppMode_Init.c \
-../AppMode_Operation.c \
-../AppScheduling.c \
-../Cpu0_Main.c \
-../Driver_Adc.c \
-../Driver_Asc.c \
-../Driver_Gtm.c \
-../Driver_Port.c \
-../Driver_Stm.c \
-../Driver_Watchdog.c \
-../Driver_encoder.c 
+../Cpu0_Main.c 
 
 COMPILED_SRCS += \
-./AppMode.src \
-./AppMode_Error.src \
-./AppMode_Idle.src \
-./AppMode_Init.src \
-./AppMode_Operation.src \
-./AppScheduling.src \
-./Cpu0_Main.src \
-./Driver_Adc.src \
-./Driver_Asc.src \
-./Driver_Gtm.src \
-./Driver_Port.src \
-./Driver_Stm.src \
-./Driver_Watchdog.src \
-./Driver_encoder.src 
+./Cpu0_Main.src 
 
 C_DEPS += \
-./AppMode.d \
-./AppMode_Error.d \
-./AppMode_Idle.d \
-./AppMode_Init.d \
-./AppMode_Operation.d \
-./AppScheduling.d \
-./Cpu0_Main.d \
-./Driver_Adc.d \
-./Driver_Asc.d \
-./Driver_Gtm.d \
-./Driver_Port.d \
-./Driver_Stm.d \
-./Driver_Watchdog.d \
-./Driver_encoder.d 
+./Cpu0_Main.d 
 
 OBJS += \
-./AppMode.o \
-./AppMode_Error.o \
-./AppMode_Idle.o \
-./AppMode_Init.o \
-./AppMode_Operation.o \
-./AppScheduling.o \
-./Cpu0_Main.o \
-./Driver_Adc.o \
-./Driver_Asc.o \
-./Driver_Gtm.o \
-./Driver_Port.o \
-./Driver_Stm.o \
-./Driver_Watchdog.o \
-./Driver_encoder.o 
+./Cpu0_Main.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -77,98 +25,7 @@ OBJS += \
 	@echo 'Finished building: $<'
 	@echo ' '
 
-AppMode.o: ./AppMode.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-AppMode_Error.o: ./AppMode_Error.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-AppMode_Idle.o: ./AppMode_Idle.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-AppMode_Init.o: ./AppMode_Init.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-AppMode_Operation.o: ./AppMode_Operation.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-AppScheduling.o: ./AppScheduling.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
 Cpu0_Main.o: ./Cpu0_Main.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-Driver_Adc.o: ./Driver_Adc.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-Driver_Asc.o: ./Driver_Asc.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-Driver_Gtm.o: ./Driver_Gtm.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-Driver_Port.o: ./Driver_Port.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-Driver_Stm.o: ./Driver_Stm.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-Driver_Watchdog.o: ./Driver_Watchdog.src subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
-Driver_encoder.o: ./Driver_encoder.src subdir.mk
 	@echo 'Building file: $<'
 	@echo 'Invoking: TASKING Assembler'
 	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
@@ -179,7 +36,7 @@ Driver_encoder.o: ./Driver_encoder.src subdir.mk
 clean: clean--2e-
 
 clean--2e-:
-	-$(RM) ./AppMode.d ./AppMode.o ./AppMode.src ./AppMode_Error.d ./AppMode_Error.o ./AppMode_Error.src ./AppMode_Idle.d ./AppMode_Idle.o ./AppMode_Idle.src ./AppMode_Init.d ./AppMode_Init.o ./AppMode_Init.src ./AppMode_Operation.d ./AppMode_Operation.o ./AppMode_Operation.src ./AppScheduling.d ./AppScheduling.o ./AppScheduling.src ./Cpu0_Main.d ./Cpu0_Main.o ./Cpu0_Main.src ./Driver_Adc.d ./Driver_Adc.o ./Driver_Adc.src ./Driver_Asc.d ./Driver_Asc.o ./Driver_Asc.src ./Driver_Gtm.d ./Driver_Gtm.o ./Driver_Gtm.src ./Driver_Port.d ./Driver_Port.o ./Driver_Port.src ./Driver_Stm.d ./Driver_Stm.o ./Driver_Stm.src ./Driver_Watchdog.d ./Driver_Watchdog.o ./Driver_Watchdog.src ./Driver_encoder.d ./Driver_encoder.o ./Driver_encoder.src
+	-$(RM) ./Cpu0_Main.d ./Cpu0_Main.o ./Cpu0_Main.src
 
 .PHONY: clean--2e-
 

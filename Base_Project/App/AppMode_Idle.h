@@ -1,37 +1,30 @@
+#ifndef APPMODE_IDLE
+#define APPMODE_IDLE
+
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
-#include "Driver_Port.h"
+#include "App/AppMode.h"
+#include "Ifx_Types.h"
+
+/***********************************************************************/
+/*Typedef*/ 
+/***********************************************************************/
 
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
 
 /***********************************************************************/
-/*Typedef*/ 
+/*External Variable*/ 
 /***********************************************************************/
 
 
 /***********************************************************************/
-/*Static Function Prototype*/ 
+/*Global Function Prototype*/ 
 /***********************************************************************/
+extern void Unit_ModeIdle(ModeInfo* pModeInfo);
 
 
-/***********************************************************************/
-/*Variable*/ 
-/***********************************************************************/
 
-
-/***********************************************************************/
-/*Function*/ 
-/***********************************************************************/
-void Driver_Port_Init(void)
-{
-    /*P00_5    Digital Output*/
-//    IfxPort_setPinModeOutput(IfxPort_P00_5.port, IfxPort_P00_5.pinIndex, IfxPort_OutputMode_pushPull, IfxPort_OutputIdx_general);
-//    IfxPort_setPinLow(IfxPort_P00_5.port, IfxPort_P00_5.pinIndex);
-    // Direction Pin 10.2 (D13)
-    IfxPort_setPinModeOutput(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex, IfxPort_OutputMode_pushPull, IfxPort_OutputIdx_general);
-    IfxPort_setPinLow(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex);
-}
-
+#endif /* DRIVER_STM */

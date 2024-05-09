@@ -1,11 +1,11 @@
-#ifndef APPMODE_INIT
-#define APPMODE_INIT
+#ifndef APPMODE_ERROR
+#define APPMODE_ERROR
 
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
+#include "App/AppMode.h"
 #include "Ifx_Types.h"
-#include "AppMode.h"
 
 /***********************************************************************/
 /*Typedef*/ 
@@ -23,8 +23,7 @@
 /***********************************************************************/
 /*Global Function Prototype*/ 
 /***********************************************************************/
-extern void Unit_ModeInit(ModeInfo* pModeInfo);
-
+extern void Unit_ModeError(ModeInfo* pModeInfo);
 
 
 

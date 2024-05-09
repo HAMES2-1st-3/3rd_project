@@ -1,16 +1,17 @@
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
+#include <App/AppScheduling.h>
+#include <Device_driver/Driver_Adc.h>
+#include <Device_driver/Driver_Asc.h>
+#include <Device_driver/Driver_encoder.h>
+#include <Device_driver/Driver_Gtm.h>
+#include <Device_driver/Driver_Port.h>
+#include <Device_driver/Driver_Stm.h>
+#include <Device_driver/Driver_Watchdog.h>
+#include <Device_driver/ASCLIN3_USB_UART.h>
 #include "Ifx_Types.h"
 #include "IfxCpu.h"
-#include "Driver_Watchdog.h"
-#include "Driver_Stm.h"
-#include "Driver_Port.h"
-#include "Driver_Adc.h"
-#include "Driver_Asc.h"
-#include "Driver_Gtm.h"
-#include "AppScheduling.h"
-#include "Driver_encoder.h"
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
@@ -36,7 +37,7 @@ int core0_main(void)
     //Driver_Adc_Init();
 //    Driver_Asc_Init();
     Driver_Gtm_Init();
-    
+    Driver_ASCLIN3_init();
     /*Global Interrupt Enable*/
     IfxCpu_enableInterrupts();
     encoder_init();

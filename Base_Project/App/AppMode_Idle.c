@@ -1,7 +1,7 @@
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
-#include "AppMode_Error.h"
+#include <App/AppMode_Idle.h>
 
 /***********************************************************************/
 /*Define*/ 
@@ -23,13 +23,13 @@
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
-void Unit_ModeError(ModeInfo* pModeInfo)
+void Unit_ModeIdle(ModeInfo* pModeInfo)
 {
     pModeInfo->u32nuModeCnt++;
 
-    if(pModeInfo->u8nuTestModeTrigger == 0u)
+    if(pModeInfo->u8nuTestModeTrigger == 2u)
     {
-        pModeInfo->enuCurMode = INIT_MODE;
+        pModeInfo->enuCurMode = OPER_MODE;
         pModeInfo->u32nuModeCnt = 0u;
     }    
 }

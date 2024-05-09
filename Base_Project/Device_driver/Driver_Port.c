@@ -1,7 +1,7 @@
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
-#include "Driver_Watchdog.h"
+#include <Device_driver/Driver_Port.h>
 
 /***********************************************************************/
 /*Define*/ 
@@ -25,9 +25,13 @@
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
-void Driver_Watchdog_Init(void)
+void Driver_Port_Init(void)
 {
-    IfxScuWdt_disableCpuWatchdog(IfxScuWdt_getCpuWatchdogPassword());
-    IfxScuWdt_disableSafetyWatchdog(IfxScuWdt_getSafetyWatchdogPassword());
+    /*P00_5    Digital Output*/
+//    IfxPort_setPinModeOutput(IfxPort_P00_5.port, IfxPort_P00_5.pinIndex, IfxPort_OutputMode_pushPull, IfxPort_OutputIdx_general);
+//    IfxPort_setPinLow(IfxPort_P00_5.port, IfxPort_P00_5.pinIndex);
+    // Direction Pin 10.2 (D13)
+    IfxPort_setPinModeOutput(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex, IfxPort_OutputMode_pushPull, IfxPort_OutputIdx_general);
+    IfxPort_setPinLow(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex);
 }
 

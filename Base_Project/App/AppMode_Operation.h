@@ -1,22 +1,15 @@
-#ifndef DRIVER_STM
-#define DRIVER_STM
+#ifndef APPMODE_OPERATION
+#define APPMODE_OPERATION
 
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
+#include "App/AppMode.h"
 #include "Ifx_Types.h"
-#include "IfxStm.h"
-#include "IfxCpu_Irq.h"
 
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
-typedef struct
-{
-    uint8_t u8nuScheduling1msFlag;
-    uint8_t u8nuScheduling10msFlag;
-    uint8_t u8nuScheduling100msFlag;
-}SchedulingFlag;
 
 /***********************************************************************/
 /*Define*/ 
@@ -25,13 +18,13 @@ typedef struct
 /***********************************************************************/
 /*External Variable*/ 
 /***********************************************************************/
-extern SchedulingFlag stSchedulingInfo;
 
 
 /***********************************************************************/
 /*Global Function Prototype*/ 
 /***********************************************************************/
-extern void Driver_Stm_Init(void);
+extern void Unit_ModeOperation(ModeInfo* pModeInfo);
+
 
 
 #endif /* DRIVER_STM */
