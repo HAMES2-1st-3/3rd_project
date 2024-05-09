@@ -52,6 +52,7 @@ float32 Ki_w = 2.0;                         // Ki for angular velocity
 float32 Vin;                                // V
 float32 Wd = 1;                             // 1 rotate/s (page.141)
 uint32 t1 = 4, t2 = 19, t3 = 29, t4 = 44;   // time (page.141)
+uint32 period = 10;
 int flag = 1;                               // debugging Vin for USB_printf
 /***********************************************************************/
 /*Function*/ 
@@ -61,7 +62,7 @@ static void AppTask1ms(void)
 {
     stTestCnt.u32nuCnt1ms++;
 
-    rad_ref = sin(2*PI*stTestCnt.u32nuCnt1ms*Ts*0.1)*2*PI;  // period: 10s, max: 2*PI, min: -2*PI
+    rad_ref = sin(2*PI*stTestCnt.u32nuCnt1ms*Ts*1/period)*2*PI;  // period: 10s, max: 2*PI, min: -2*PI
     rad = encoder_get_radians();                            // get radian from encoder
 //    rad = LPF(rad_old, rad, 500, Ts); // weird...
     w_ref = PID(rad_ref, rad, Kp_r, Ki_r, Ts);
@@ -74,34 +75,6 @@ static void AppTask1ms(void)
     w_old = w;
     if(stTestCnt.u32nuCnt1ms % 1000 == 0) // Count 1s
         t++;
-/*
-     // Refrence w (book page.141)
-    if(t <= t1){
-        w_ref = 0;
-    }
-    else if(t <= t2){
-        w_ref = 0.06667*Wd*(2*PI)*(t-4);
-    }
-    else if(t <= t3){
-        w_ref = Wd*(2*PI);
-    }
-    else if(t <= t4){
-        w_ref = Wd*2*PI - 0.06667*Wd*(2*PI)*(t-26);
-    }
-    else{
-        w_ref = 0;
-    }
-     // PI control
-    if(t <= t1){
-        Vin = 0;
-    }
-    else if(t < t4){
-        Vin = PID(w_ref, w, Kp_w, Ki_w, Ts);
-        Vin = saturation(0, 11, Vin);
-    }
-    else{
-        Vin = 0;
-    }*/
     Vin = PID(w_ref, w,Kp_w, Ki_w, Ts);
     Vin = saturation(-11,11, Vin);
     if(Vin < 0){
