@@ -1,5 +1,5 @@
-# 3rd_project
-> Temporary project name
+# MechanumWheelControl
+> Mechanum Wheel-based Precision Control
 
 <table>
  <tr>
@@ -47,6 +47,29 @@
 - 이슈 만들어서 Number 확인하고, 커밋할때 앞에다가 #이슈번호 붙혀서 커밋하기!!
 - 브랜치도 이슈 Number 따라서 만들기( ex. feature/7 )
 
-## :white_check_mark: 기타 규칙
-- `goto` 문 사용하지 않기
-- 포인터 사용하지 않기 
+## :white_check_mark: Coding Naming Convection
+
+1. Type 선언시 `_t` 붙이지 않기, AURIX Ifx 제공 자료형 사용
+    * ex) `uint32`(O), `uint32_t`(X), `int8`(X), `sint8`(O), `float32`(O), `int`(X), `double`(X), 
+    ```
+    typedef unsigned char       boolean;        /* for use with TRUE/FALSE      */
+    typedef unsigned char       uint8;
+    typedef unsigned short      uint16;
+    typedef unsigned long       uint32;
+    typedef unsigned long long  uint64;
+
+    typedef signed char         sint8;
+    typedef short               sint16;
+    typedef long                sint32;
+    typedef long long           sint64;
+
+    typedef float               float32;
+    typedef double              float64;
+    ```
+3. 지정자에 따라 접두어 붙이기
+      * static : `s_varname`
+      * extern : `g_varname`
+      * pointer : `p_varname`
+
+4. 변수 네이밍 규칙 : Snake Case convention 적용 - 예) `rpm_ref`, `sub_state`
+5. 함수 네이밍 규칙 : Snake Case convention 적용 - 예) `get_state()`
