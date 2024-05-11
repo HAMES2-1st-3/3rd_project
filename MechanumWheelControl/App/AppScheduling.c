@@ -4,7 +4,7 @@
 #include <App/AppMode.h>
 #include <App/AppScheduling.h>
 #include <DeviceDriver/Driver_Stm.h>
-
+#include <DeviceDriver/Driver_Tof.h>
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -31,6 +31,7 @@ static void AppTask500ms(void);
 /*Variable*/ 
 /***********************************************************************/
 TestCnt stTestCnt;
+uint32 g_sub_state;
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
@@ -43,6 +44,7 @@ static void AppTask1ms(void)
 static void AppTask10ms(void)
 {
     stTestCnt.u32nuCnt10ms++;
+    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
 {

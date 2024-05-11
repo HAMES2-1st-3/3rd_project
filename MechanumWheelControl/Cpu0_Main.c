@@ -44,11 +44,13 @@ void core0_main(void)
     /* Wait for CPU sync event */
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
+    Driver_Stm_Init(); // for AppScheduling
 
-    Driver_Stm_Init();
+    /* Initialize Device Driver */
+    init_tof();
+
     while(1)
     {
-
         AppScheduling();
     }
 }
