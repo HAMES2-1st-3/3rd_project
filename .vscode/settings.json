@@ -1,0 +1,6 @@
+{
+        "files.associations": {
+                "driver_asclin3.h": "c",
+                "driver_usb.h": "c"
+        }
+}
