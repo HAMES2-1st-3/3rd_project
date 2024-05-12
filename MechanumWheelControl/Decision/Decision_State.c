@@ -1,5 +1,5 @@
 /*
- * Decision_RPM.c
+ * Decision_State.c
  *
  *  Created on: 2024. 5. 10.
  *      Author: user
@@ -19,28 +19,81 @@
  */
 
 /***********************************************************************/
-/*Include*/ 
+/*Include*/
+/***********************************************************************/
+#include "Driver_Joystick.h"
+/***********************************************************************/
+/*Define*/
 /***********************************************************************/
 
 /***********************************************************************/
-/*Define*/ 
+/*Typedef*/
 /***********************************************************************/
 
 /***********************************************************************/
-/*Typedef*/ 
+/*Static Function Prototype*/
 /***********************************************************************/
 
 /***********************************************************************/
-/*Static Function Prototype*/ 
+/*Variable*/
 /***********************************************************************/
+uint32 move_x_val =0;
+uint32 move_y_val =0;
+uint32 rotate_x_val =0;
+uint32 rotate_y_val =0;
+uint32 state_val=0;
 
 /***********************************************************************/
-/*Variable*/ 
+/*Function*/
 /***********************************************************************/
+int Get_Joystick_value(void)
+{
 
-/***********************************************************************/
-/*Function*/ 
-/***********************************************************************/
+    /*ADC Test*/
+    DrvAdc_GetAdcRawGroup0();
+    DrvAdc_GetAdcRawGroup2();
 
+    SensorAdcRaw* moveAdcRaw = MidAdc_GetAdcGroup2SenseRaw();
+    SensorAdcRaw* rotateAdcRaw = MidAdc_GetAdcGroup0SenseRaw();
 
+    move_x_val= moveAdcRaw->UlSSense1_Raw;
+    move_y_val= moveAdcRaw->UlSSense2_Raw;
 
+    if(move_x_val <= 1570 && move_y_val <= 1570){
+        state_val = 0;
+    }
+    else if(move_x_val >=3350 && move_y_val <= 1570){
+        state_val = 2;
+    }
+    else if(move_x_val <=1570 && move_y_val > 3350){
+        state_val = 6;
+    }
+    else if(move_x_val >= 3350 && move_y_val > 3350){
+        state_val = 8;
+    }
+    else if(move_x_val < 3350 && move_y_val < 1570){
+        state_val = 1;
+    }
+    else if(move_x_val >= 3350 && move_y_val <= 3350){
+        state_val = 5;
+    }
+    else if(move_x_val < 3350 && move_y_val > 3350){
+        state_val = 7;
+    }
+    else if(move_x_val <= 1570 && move_y_val <= 3350){
+        state_val = 3;
+    }
+    else {
+        rotate_x_val= rotateAdcRaw->UlSSense1_Raw;
+        rotate_y_val= rotateAdcRaw->UlSSense2_Raw;
+        if(rotate_x_val>=3350 && rotate_y_val<3350 &&rotate_y_val>=1570){
+            state_val = 9;
+        }
+        else if(rotate_x_val<=1570 &&rotate_y_val<3350 &&rotate_y_val>=1570){
+            state_val = 10;
+        }
+        else state_val =4;
+    }
+
+    return state_val;
+}
