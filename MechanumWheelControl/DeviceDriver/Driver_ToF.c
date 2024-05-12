@@ -2,14 +2,14 @@
  * Driver_ToF.c
  *
  *  Created on: 2024. 5. 10.
- *      Author: jekim
+ *      Author: jaeeun
  */
 
 
 /***********************************************************************/
 /*Include*/
 /***********************************************************************/
-#include <DeviceDriver/Driver_ToF.h>
+#include <Driver_ToF.h>
 /***********************************************************************/
 /*Define*/
 /***********************************************************************/
@@ -26,8 +26,8 @@ static int check_tof_strength(unsigned char data[]);
 /***********************************************************************/
 /*Variable*/
 /***********************************************************************/
-uint8 g_asclin1_uartTxBuffer[ASC1_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
-uint8 g_asclin1_uartRxBuffer[ASC1_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
+uint8 g_asclin1_tx_buffer[ASC1_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
+uint8 g_asclin1_rx_buffer[ASC1_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 uint32 g_rx_idx = 0;
 uint8 g_buf_tof[16] = { 0 };
 IfxAsclin_Asc g_asclin1;
@@ -100,9 +100,9 @@ void init_tof(void)
     asc_conf.pins = &pins;
 
     /* FIFO buffers configuration */
-    asc_conf.txBuffer = g_asclin1_uartTxBuffer;                      /* Set the transmission buffer                          */
+    asc_conf.txBuffer = g_asclin1_tx_buffer;                      /* Set the transmission buffer                          */
     asc_conf.txBufferSize = ASC1_TX_BUFFER_SIZE;              /* Set the transmission buffer size                     */
-    asc_conf.rxBuffer = g_asclin1_uartRxBuffer;                      /* Set the receiving buffer                             */
+    asc_conf.rxBuffer = g_asclin1_rx_buffer;                      /* Set the receiving buffer                             */
     asc_conf.rxBufferSize = ASC1_RX_BUFFER_SIZE;              /* Set the receiving buffer size                        */
 
     /* Init ASCLIN module */

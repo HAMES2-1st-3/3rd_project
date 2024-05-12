@@ -1,8 +1,8 @@
 /*
- * Driver_Buzzer.h
+ * Driver_Potentiometer.h
  *
  *  Created on: 2024. 5. 10.
- *      Author: jekim
+ *      Author: jaeeun
  */
 
 #ifndef DEVICEDRIVER_DRIVER_BUZZER_H_

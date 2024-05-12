@@ -15,7 +15,7 @@
 /***********************************************************************/
 #include "Ifx_Types.h"
 #include "_Utilities/Ifx_Assert.h"
-#include <DeviceDriver/Driver_ASCLIN3.h>
+#include <Driver_ASCLIN3.h>
 
 #include <string.h>
 #include <stdio.h>

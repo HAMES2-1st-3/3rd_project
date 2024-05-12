@@ -2,7 +2,7 @@
  * Driver_ToF.h
  *
  *  Created on: 2024. 5. 10.
- *      Author: jekim
+ *      Author: jaeeun
  */
 
 #ifndef DEVICEDRIVER_DRIVER_TOF_H_
@@ -20,7 +20,7 @@
 #include "IfxAsclin_bf.h"
 #include "IfxAsclin_Asc.h"
 #include "IfxSrc_reg.h"
-#include <DeviceDriver/Interrupt_Priority.h>
+#include <Interrupt_Priority.h>
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/

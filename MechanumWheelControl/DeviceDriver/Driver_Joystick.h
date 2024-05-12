@@ -1,3 +1,10 @@
+/*
+ * Driver_Joystick.h
+ *
+ *  Created on: 2024. 5. 10.
+ *      Author: howon
+ */
+
 #ifndef DRIVER_JOYSTICK
 #define DRIVER_JOYSTICK
 
@@ -10,8 +17,8 @@
 #include "IfxPort.h"
 #include "IfxPort_PinMap.h"
 
-#define MidAdc_GetAdcGroup2SenseRaw() (&stSensorAdc2Raw)
-#define MidAdc_GetAdcGroup0SenseRaw() (&stSensorAdc0Raw)
+#define get_mid_adc_group2_raw() (&g_adc2_raw)
+#define get_mid_adc_group0_raw() (&g_adc0_raw)
 
 
 /***********************************************************************/
@@ -49,8 +56,8 @@ typedef struct{ //센싱 변수
         uint32 UlSSense3_Raw;
 }SensorAdcRaw;
 
-extern SensorAdcRaw stSensorAdc0Raw; //전력 센싱 변수
-extern SensorAdcRaw stSensorAdc2Raw; //전력 센싱 변수
+extern SensorAdcRaw g_adc0_raw; //전력 센싱 변수
+extern SensorAdcRaw g_adc2_raw; //전력 센싱 변수
 
 /***********************************************************************/
 /*Define*/
@@ -66,8 +73,8 @@ extern SensorAdcRaw stSensorAdc2Raw; //전력 센싱 변수
 /*Global Function Prototype*/
 /***********************************************************************/
 
-extern void Init_Joystick(void);
-extern void DrvAdc_GetAdcRawGroup0(void);
-extern void DrvAdc_GetAdcRawGroup2(void);
+extern void init_joystick(void);
+extern void get_adc_group0_raw(void);
+extern void get_adc_group2_raw(void);
 
 #endif /* DRIVER_STM */

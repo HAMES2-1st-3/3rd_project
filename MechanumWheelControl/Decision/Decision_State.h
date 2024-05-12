@@ -41,6 +41,6 @@
 /*Global Function Prototype*/
 /***********************************************************************/
 
-int Get_Joystick_value(void);
+int get_state(void);
 
 #endif /* DECISION_STATE_H_ */

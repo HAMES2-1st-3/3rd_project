@@ -1,9 +1,8 @@
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
-#include <App/AppMode.h>
-#include <App/AppScheduling.h>
-#include <DeviceDriver/Driver_Stm.h>
+#include <AppMode.h>
+#include <AppScheduling.h>
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -30,7 +29,7 @@ static void AppTask500ms(void);
 /***********************************************************************/
 /*Variable*/ 
 /***********************************************************************/
-TestCnt stTestCnt;
+TestCnt g_test_cnt;
 uint32 g_sub_state;
 uint32 g_rpm_ref;
 /***********************************************************************/
@@ -39,12 +38,12 @@ uint32 g_rpm_ref;
 
 static void AppTask1ms(void)
 {
-    stTestCnt.u32nuCnt1ms++;
+    g_test_cnt.u32nuCnt1ms++;
 }
 
 static void AppTask10ms(void)
 {
-    stTestCnt.u32nuCnt10ms++;
+    g_test_cnt.u32nuCnt10ms++;
     g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
@@ -57,7 +56,7 @@ static void AppTask50ms(void)
 }
 static void AppTask100ms(void)
 {
-    stTestCnt.u32nuCnt100ms++;
+    g_test_cnt.u32nuCnt100ms++;
 }
 static void AppTask250ms(void)
 {
@@ -75,39 +74,39 @@ static void AppNoTask()
 void AppScheduling(void)
 {
     AppNoTask();
-    if(stSchedulingInfo.u8nuScheduling1msFlag == 1u)
+    if(g_scheduling_info.scheduling_flag_1ms == 1u)
     {
-        stSchedulingInfo.u8nuScheduling1msFlag = 0u;
+        g_scheduling_info.scheduling_flag_1ms = 0u;
         AppTask1ms();
         
-        if(stSchedulingInfo.u8nuScheduling10msFlag == 1u)
+        if(g_scheduling_info.scheduling_flag_10ms == 1u)
         {
-            stSchedulingInfo.u8nuScheduling10msFlag = 0u;
+            g_scheduling_info.scheduling_flag_10ms = 0u;
             AppTask10ms();
         }
-        if(stSchedulingInfo.u8nuScheduling20msFlag == 1u)
+        if(g_scheduling_info.scheduling_flag_20ms == 1u)
         {
-            stSchedulingInfo.u8nuScheduling20msFlag = 0u;
+            g_scheduling_info.scheduling_flag_20ms = 0u;
             AppTask20ms();
         }
-        if(stSchedulingInfo.u8nuScheduling50msFlag == 1u)
+        if(g_scheduling_info.scheduling_flag_50ms == 1u)
         {
-            stSchedulingInfo.u8nuScheduling50msFlag = 0u;
+            g_scheduling_info.scheduling_flag_50ms = 0u;
             AppTask50ms();
         }
-        if(stSchedulingInfo.u8nuScheduling100msFlag == 1u)
+        if(g_scheduling_info.scheduling_flag_100ms == 1u)
         {
-            stSchedulingInfo.u8nuScheduling100msFlag = 0u;
+            g_scheduling_info.scheduling_flag_100ms = 0u;
             AppTask100ms();
         }
-        if(stSchedulingInfo.u8nuScheduling250msFlag == 1u)
+        if(g_scheduling_info.scheduling_flag_250ms == 1u)
         {
-            stSchedulingInfo.u8nuScheduling250msFlag = 0u;
+            g_scheduling_info.scheduling_flag_250ms = 0u;
             AppTask100ms();
         }
-        if(stSchedulingInfo.u8nuScheduling500msFlag == 1u)
+        if(g_scheduling_info.scheduling_flag_500ms == 1u)
         {
-            stSchedulingInfo.u8nuScheduling500msFlag = 0u;
+            g_scheduling_info.scheduling_flag_500ms = 0u;
             AppTask500ms();
         }
     }
