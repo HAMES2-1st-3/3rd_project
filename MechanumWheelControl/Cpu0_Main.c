@@ -28,7 +28,6 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 #include <App/AppScheduling.h>
-#include <DeviceDriver/Driver_Stm.h>
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
 void core0_main(void)
@@ -48,7 +47,7 @@ void core0_main(void)
 
     /* Initialize Device Driver */
     init_tof();
-
+    init_potentiometer();
     while(1)
     {
         AppScheduling();

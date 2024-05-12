@@ -18,6 +18,7 @@ typedef struct
     uint8 u8nuScheduling20msFlag;
     uint8 u8nuScheduling50msFlag;
     uint8 u8nuScheduling100msFlag;
+    uint8 u8nuScheduling250msFlag;
     uint8 u8nuScheduling500msFlag;
 }SchedulingFlag;
 
