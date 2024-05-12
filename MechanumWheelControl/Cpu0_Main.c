@@ -26,9 +26,11 @@
  *********************************************************************************************************************/
 #include "Ifx_Types.h"
 #include "IfxCpu.h"
+#include "BSP.h"
 #include "IfxScuWdt.h"
 #include <App/AppScheduling.h>
 #include <DeviceDriver/Driver_Stm.h>
+#include <DeviceDriver/Driver_Buzzer.h>
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
 void core0_main(void)
@@ -44,13 +46,21 @@ void core0_main(void)
     /* Wait for CPU sync event */
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
-    Driver_Stm_Init(); // for AppScheduling
 
-    /* Initialize Device Driver */
-    init_tof();
+    Ifx_TickTime ticks = IfxStm_getTicksFromMilliseconds(BSP_DEFAULT_TIMER, 2000); // 2000/600
+
+    Driver_Stm_Init();
+
+    init_buzzer(); //init buzzer
+
 
     while(1)
     {
+
+        //makeSound(12,0.1);
+        //waitTime(ticks);
+        //makeSound(12);
+        //waitTime(ticks);
         AppScheduling();
     }
 }

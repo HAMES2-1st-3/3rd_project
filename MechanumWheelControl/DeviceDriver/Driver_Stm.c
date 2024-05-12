@@ -61,13 +61,17 @@ void STM_Int0Handler(void)
     {
         stSchedulingInfo.u8nuScheduling20msFlag = 1u;
     }
-    if(u32nuCounter1ms % 50 == 0u)
+    if( (u32nuCounter1ms % 50) == 0u)
     {
         stSchedulingInfo.u8nuScheduling50msFlag = 1u;
     }
     if((u32nuCounter1ms % 100) == 0u)
     {
         stSchedulingInfo.u8nuScheduling100msFlag = 1u;
+    }
+    if((u32nuCounter1ms % 250) == 0u)
+    {
+        stSchedulingInfo.u8nuScheduling250msFlag = 1u;
     }
     if((u32nuCounter1ms % 500) == 0u)
     {
