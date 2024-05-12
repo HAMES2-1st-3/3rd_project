@@ -5,6 +5,9 @@
 /*Include*/ 
 /***********************************************************************/
 #include "Ifx_Types.h"
+#include <DeviceDriver/Driver_Tof.h>
+#include <Decision/Decision_Sub_State.h>
+#include <Decision/Decision_RPM.h>
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/

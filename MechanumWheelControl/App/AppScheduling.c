@@ -4,7 +4,6 @@
 #include <App/AppMode.h>
 #include <App/AppScheduling.h>
 #include <DeviceDriver/Driver_Stm.h>
-#include <DeviceDriver/Driver_Tof.h>
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -26,12 +25,14 @@ static void AppTask10ms(void);
 static void AppTask20ms(void);
 static void AppTask50ms(void);
 static void AppTask100ms(void);
+static void AppTask250ms(void);
 static void AppTask500ms(void);
 /***********************************************************************/
 /*Variable*/ 
 /***********************************************************************/
 TestCnt stTestCnt;
 uint32 g_sub_state;
+uint32 g_rpm_ref;
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
@@ -48,7 +49,7 @@ static void AppTask10ms(void)
 }
 static void AppTask20ms(void)
 {
-
+    g_rpm_ref = get_rpm_reference();
 }
 static void AppTask50ms(void)
 {
@@ -57,6 +58,10 @@ static void AppTask50ms(void)
 static void AppTask100ms(void)
 {
     stTestCnt.u32nuCnt100ms++;
+}
+static void AppTask250ms(void)
+{
+
 }
 static void AppTask500ms(void)
 {
@@ -93,6 +98,11 @@ void AppScheduling(void)
         if(stSchedulingInfo.u8nuScheduling100msFlag == 1u)
         {
             stSchedulingInfo.u8nuScheduling100msFlag = 0u;
+            AppTask100ms();
+        }
+        if(stSchedulingInfo.u8nuScheduling250msFlag == 1u)
+        {
+            stSchedulingInfo.u8nuScheduling250msFlag = 0u;
             AppTask100ms();
         }
         if(stSchedulingInfo.u8nuScheduling500msFlag == 1u)
