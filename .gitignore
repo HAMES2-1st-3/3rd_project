@@ -7,3 +7,4 @@
 *.mdf
 *.mk
 *.opt
+./.settings/language.settings.xml
