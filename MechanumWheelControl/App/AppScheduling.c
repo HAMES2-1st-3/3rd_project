@@ -3,6 +3,15 @@
 /***********************************************************************/
 #include <AppMode.h>
 #include <AppScheduling.h>
+
+#include <Driver_Stm.h>
+
+#include <Control_Buzzer.h>
+#include <Control_Motor.h>
+
+#include <Decision_RPM.h>
+#include <Decision_State.h>
+#include <Decision_Sub_State.h>
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -10,12 +19,8 @@
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
-typedef struct
-{
-    uint32 u32nuCnt1ms;
-    uint32 u32nuCnt10ms;
-    uint32 u32nuCnt100ms;
-}TestCnt;
+
+
 /***********************************************************************/
 /*Static Function Prototype*/ 
 /***********************************************************************/
@@ -29,8 +34,8 @@ static void AppTask500ms(void);
 /***********************************************************************/
 /*Variable*/ 
 /***********************************************************************/
-TestCnt g_test_cnt;
-uint32 g_sub_state;
+
+uint8 g_sub_state;
 uint32 g_rpm_ref;
 /***********************************************************************/
 /*Function*/ 
@@ -38,12 +43,11 @@ uint32 g_rpm_ref;
 
 static void AppTask1ms(void)
 {
-    g_test_cnt.u32nuCnt1ms++;
+
 }
 
 static void AppTask10ms(void)
 {
-    g_test_cnt.u32nuCnt10ms++;
     g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
@@ -56,7 +60,7 @@ static void AppTask50ms(void)
 }
 static void AppTask100ms(void)
 {
-    g_test_cnt.u32nuCnt100ms++;
+
 }
 static void AppTask250ms(void)
 {
@@ -102,7 +106,7 @@ void AppScheduling(void)
         if(g_scheduling_info.scheduling_flag_250ms == 1u)
         {
             g_scheduling_info.scheduling_flag_250ms = 0u;
-            AppTask100ms();
+            AppTask250ms();
         }
         if(g_scheduling_info.scheduling_flag_500ms == 1u)
         {

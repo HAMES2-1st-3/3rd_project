@@ -73,8 +73,8 @@ extern SensorAdcRaw g_adc2_raw; //전력 센싱 변수
 /*Global Function Prototype*/
 /***********************************************************************/
 
-extern void init_joystick(void);
-extern void get_adc_group0_raw(void);
-extern void get_adc_group2_raw(void);
+void init_joystick(void);
+void get_adc_group0_raw(void);
+void get_adc_group2_raw(void);
 
-#endif /* DRIVER_STM */
+#endif /* DRIVER_JOYSTICK */

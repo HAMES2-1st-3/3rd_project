@@ -35,7 +35,6 @@ SchedulingFlag g_scheduling_info;
 /*Function*/ 
 /***********************************************************************/
 IFX_INTERRUPT(STM_Int0Handler, 0, 100);
-
 void STM_Int0Handler(void)
 {
     IfxCpu_enableInterrupts();    

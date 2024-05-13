@@ -38,8 +38,6 @@ uint32 potentiometer_raw;
 
 void init_potentiometer(void)
 {
-    uint32    chnIx;
-
     /* VADC Configuration */
 
     /* create configuration */
@@ -99,6 +97,5 @@ uint32 get_potentiometer_value(void){ // 0 ~ 4095
     conversion_result=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP4_CH7]); //x_val
     potentiometer_raw = conversion_result.B.RESULT;
 
-    IfxVadc_Adc_startScan(&s_vadc_autoscan.adcGroup);
     return potentiometer_raw;
 }

@@ -236,8 +236,8 @@ static inline boolean get_motorRL_direction(void){
 /*------------------------------------------encoder driver Implementations-------------------------------------------*/
 /*********************************************************************************************************************/
 
-IFX_INTERRUPT(encoderRL_chA_isr, 0, ISR_PRIORITY_SCUERU2);
-void encoderRL_chA_isr(void){
+IFX_INTERRUPT(encoderRL_chA_ISR, 0, ISR_PRIORITY_SCUERU2);
+void encoderRL_chA_ISR(void){
     if(IfxPort_getPinState(ENCODER_CHA)) { // rising edge triggered
         if(IfxPort_getPinState(ENCODER_CHB)) {
             s_encoder_data--;

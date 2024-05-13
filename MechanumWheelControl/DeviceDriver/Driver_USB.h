@@ -14,12 +14,7 @@
 /*Include*/
 /***********************************************************************/
 #include "Ifx_Types.h"
-#include "_Utilities/Ifx_Assert.h"
-#include <Driver_ASCLIN3.h>
 
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/
@@ -37,8 +32,12 @@
 /***********************************************************************/
 void usb_printf(pchar format,...);
 void usb_print_string(char *str, uint32 max_len) ;
-void usb_init(void);
+void init_usb(void);
 
+
+void init_asclin3(void);
+void write_asclin3_uart(const uint8 chr);
+uint8 read_asclin3_uart(void);
 
 
 #endif /* DEVICEDRIVER_DRIVER_USB_H_ */

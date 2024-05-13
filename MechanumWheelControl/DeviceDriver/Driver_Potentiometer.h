@@ -5,8 +5,8 @@
  *      Author: jaeeun
  */
 
-#ifndef DEVICEDRIVER_DRIVER_BUZZER_H_
-#define DEVICEDRIVER_DRIVER_BUZZER_H_
+#ifndef DEVICEDRIVER_DRIVER_POTENTIOMETER_H_
+#define DEVICEDRIVER_DRIVER_POTENTIOMETER_H_
 
 /***********************************************************************/
 /*Include*/ 
@@ -47,4 +47,4 @@ uint32 get_potentiometer_value(void);
 
 
 
-#endif /* DEVICEDRIVER_DRIVER_BUZZER_H_ */
+#endif /* DEVICEDRIVER_DRIVER_POTENTIOMETER_H_ */

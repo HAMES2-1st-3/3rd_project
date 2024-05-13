@@ -176,8 +176,6 @@ void get_adc_group0_raw(void){
     g_adc0_raw.UlSSense1_Raw=conversion_res.B.RESULT;
     conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP0_CH2]); //y_val
     g_adc0_raw.UlSSense2_Raw=conversion_res.B.RESULT;
-
-    IfxVadc_Adc_startScan(&s_vadc_autoscan0.adcGroup);
 }
 
 
@@ -190,6 +188,4 @@ void get_adc_group2_raw(void){
     g_adc2_raw.UlSSense1_Raw=conversion_res.B.RESULT;
     conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP2_CH4]); //y_val
     g_adc2_raw.UlSSense2_Raw=conversion_res.B.RESULT;
-
-    IfxVadc_Adc_startScan(&s_vadc_autoscan2.adcGroup);
 }
