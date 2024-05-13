@@ -76,7 +76,7 @@ void STM_Int0Handler(void)
     }
 }
 
-void Driver_Stm_Init(void)
+void init_stm(void)
 {
     /* disable interrupts */
     boolean interruptState = IfxCpu_disableInterrupts();

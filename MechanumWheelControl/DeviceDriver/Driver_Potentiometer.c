@@ -4,98 +4,115 @@
  *  Created on: 2024. 5. 10.
  *      Author: jaeeun
  */
-
 /***********************************************************************/
-/*Include*/ 
+/*Include*/
 /***********************************************************************/
 #include <Driver_Potentiometer.h>
+
 /***********************************************************************/
-/*Define*/ 
+/*Define*/
+/***********************************************************************/
+
+#define ADC_CH_ID 1
+#define ADC_GR_ID IfxVadc_GroupId_3
+
+/***********************************************************************/
+/*Typedef*/
+/***********************************************************************/
+
+
+/***********************************************************************/
+/*Static Function Prototype*/
 /***********************************************************************/
 
 /***********************************************************************/
-/*Typedef*/ 
+/*Variable*/
 /***********************************************************************/
-typedef struct
-{
-    IfxVadc_Adc vadc; /* VADC handle */
-    IfxVadc_Adc_Group adcGroup;
-} App_VadcAutoScan;
-/***********************************************************************/
-/*Static Function Prototype*/ 
-/***********************************************************************/
-static void init_channel(uint8 param_ChNum);
-/***********************************************************************/
-/*Variable*/ 
-/***********************************************************************/
-static App_VadcAutoScan s_vadc_autoscan;
-static IfxVadc_Adc_Channel s_adc0_channel[ADC_GROUP4_MAX];
-uint32 potentiometer_raw;
+static IfxVadc_Adc_Channel   s_adc0Channel[8];
+
 
 /***********************************************************************/
-/*Function*/ 
+/*Function*/
 /***********************************************************************/
+
 
 void init_potentiometer(void)
 {
+    // variable register : AD6
+    // luminous intensity : AD5
+
+    uint32    chnIx = ADC_CH_ID;
+
     /* VADC Configuration */
 
     /* create configuration */
-    IfxVadc_Adc_Config adc_config;
-    IfxVadc_Adc_initModuleConfig(&adc_config, &MODULE_VADC);
+    IfxVadc_Adc_Config adcConfig;
+    IfxVadc_Adc_initModuleConfig(&adcConfig, &MODULE_VADC);
 
     /* initialize module */
-    IfxVadc_Adc_initModule(&s_vadc_autoscan.vadc, &adc_config);
+    IfxVadc_Adc vadc;
+    IfxVadc_Adc_initModule(&vadc, &adcConfig);
 
     /* create group config */
-    IfxVadc_Adc_GroupConfig adc_group_config;
-    IfxVadc_Adc_initGroupConfig(&adc_group_config, &s_vadc_autoscan.vadc);
+    IfxVadc_Adc_GroupConfig adcGroupConfig;
+    IfxVadc_Adc_initGroupConfig(&adcGroupConfig, &vadc);
 
     /* with group 0 */
-    adc_group_config.groupId = IfxVadc_GroupId_4;
-    adc_group_config.master  = adc_group_config.groupId;
+    adcGroupConfig.groupId = ADC_GR_ID;
+    adcGroupConfig.master  = adcGroupConfig.groupId;
 
     /* enable scan source */
-    adc_group_config.arbiter.requestSlotScanEnabled = TRUE;
+    adcGroupConfig.arbiter.requestSlotScanEnabled = TRUE;
 
     /* enable auto scan */
-    adc_group_config.scanRequest.autoscanEnabled = TRUE;
+    adcGroupConfig.scanRequest.autoscanEnabled = TRUE;
 
     /* enable all gates in "always" mode (no edge detection) */
-    adc_group_config.scanRequest.triggerConfig.gatingMode = IfxVadc_GatingMode_always;
+    adcGroupConfig.scanRequest.triggerConfig.gatingMode = IfxVadc_GatingMode_always;
 
     /* initialize the group */
     /*IfxVadc_Adc_Group adcGroup;*/    //declared globally
-    IfxVadc_Adc_initGroup(&s_vadc_autoscan.adcGroup, &adc_group_config);
+    IfxVadc_Adc_Group adcGroup;
+    IfxVadc_Adc_initGroup(&adcGroup, &adcGroupConfig);
 
-    init_channel(ADC_GROUP4_CH7); //channel init
 
-    IfxVadc_Adc_startScan(&s_vadc_autoscan.adcGroup);
 
+    /*************************************channel init*******************************************/
+    IfxVadc_Adc_ChannelConfig s_adc0ChannelConfig[8];
+
+    IfxVadc_Adc_initChannelConfig(&s_adc0ChannelConfig[chnIx], &adcGroup);
+
+    s_adc0ChannelConfig[chnIx].channelId      = (IfxVadc_ChannelId)(chnIx);
+    s_adc0ChannelConfig[chnIx].resultRegister = (IfxVadc_ChannelResult)(chnIx);  /* use dedicated result register */
+
+    /* initialize the channel */
+    IfxVadc_Adc_initChannel(&s_adc0Channel[chnIx], &s_adc0ChannelConfig[chnIx]);
+
+    /* add to scan */
+    unsigned channels = (1 << s_adc0ChannelConfig[chnIx].channelId);
+    unsigned mask     = channels;
+    IfxVadc_Adc_setScan(&adcGroup, channels, mask);
+    /********************************************************************************************/
+
+    IfxVadc_Adc_startScan(&adcGroup);
 }
 
-static void init_channel(uint8 param_ChNum)
+
+uint32 get_potentiometer_value(void)
 {
-    IfxVadc_Adc_ChannelConfig adc_channel_config_info;
-    uint32 ul_temp = ((uint32)1u << param_ChNum);
+    uint32 adc0DataResult[8];
 
-    IfxVadc_Adc_initChannelConfig(&adc_channel_config_info,&s_vadc_autoscan.adcGroup);
+    uint32    chnIx = ADC_CH_ID;
+    Ifx_VADC_RES conversionResult; /* wait for valid result */
 
-    adc_channel_config_info.channelId = (IfxVadc_ChannelId)(param_ChNum);
-    adc_channel_config_info.resultRegister = (IfxVadc_ChannelResult)(param_ChNum);
+    /* check results */
+    do
+    {
+        conversionResult = IfxVadc_Adc_getResult(&s_adc0Channel[chnIx]);
+    } while (!conversionResult.B.VF);
 
-    /*Initialize the channel*/
-    IfxVadc_Adc_initChannel(&s_adc0_channel[param_ChNum],&adc_channel_config_info);
-
-    /*add to scan*/
-    IfxVadc_Adc_setScan(&s_vadc_autoscan.adcGroup,ul_temp,ul_temp);
+    adc0DataResult[chnIx] = conversionResult.B.RESULT;
+    return adc0DataResult[chnIx];
 }
 
-uint32 get_potentiometer_value(void){ // 0 ~ 4095
-    Ifx_VADC_RES conversion_result;
 
-    conversion_result=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP4_CH7]); //x_val
-    potentiometer_raw = conversion_result.B.RESULT;
-
-    return potentiometer_raw;
-}

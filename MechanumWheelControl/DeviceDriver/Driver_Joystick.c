@@ -33,11 +33,11 @@ static void init_group2_channel(uint8 param_ChNum);
 /***********************************************************************/
 /*Variable*/
 /***********************************************************************/
-App_VadcAutoScan s_vadc_autoscan0; //ADC 모듈 변수
-App_VadcAutoScan s_vadc_autoscan2; //ADC 모듈 변수
+App_VadcAutoScan s_vadc_autoscan0;
+App_VadcAutoScan s_vadc_autoscan2;
 static IfxVadc_Adc_Channel s_adc0_channel[ADC_GROUP0_MAX];
-SensorAdcRaw g_adc0_raw; //adc raw 값 받을 변수
-SensorAdcRaw g_adc2_raw; //adc raw 값 받을 변수
+SensorAdcRaw g_adc0_raw;
+SensorAdcRaw g_adc2_raw;
 
 /***********************************************************************/
 /*Function*/

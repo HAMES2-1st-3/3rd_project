@@ -31,7 +31,6 @@
 /*Global Function Prototype*/
 /***********************************************************************/
 void usb_printf(pchar format,...);
-void usb_print_string(char *str, uint32 max_len) ;
 void init_usb(void);
 
 

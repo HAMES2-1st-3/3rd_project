@@ -40,8 +40,8 @@ void init_buzzer(void)
 
     /* Initialize the configuration structure with default parameters */
     IfxGtm_Tom_Pwm_initConfig(&g_tom_config, &MODULE_GTM);
-    //ê¸°ë³¸ ìŒ 444hz  index=12
-    //freq  ë„ ë ˆ ë¯¸ íŒŒ ì†” ë†’ë‚®ì´
+    //±âº» À½ 444hz  index=12
+    //freq  µµ ·¹ ¹Ì ÆÄ ¼Ö ³ô³·ÀÌ
     float fBuzz[21]={130.812,146.832,164.813,174.614,195.997,220.000,246.941,261.686,293.724,329.724
                 ,349.309,392.089,440.000,493.858,523.225,587.275,659.187,698.376,783.884,880.000
         ,987.609
@@ -63,7 +63,7 @@ void init_buzzer(void)
 /* not use makesound()*/
 void makesound(uint16 soundIdx,float32 sound_intensity ){
 
-    //freq  ë„ ë ˆ ë¯¸ íŒŒ ì†” ë†’ë‚®ì´
+    //freq  µµ ·¹ ¹Ì ÆÄ ¼Ö ³ô³·ÀÌ
     float fBuzz[21]={130.812,146.832,164.813,174.614,195.997,220.000,246.941
                 ,
                 261.686,293.724,329.724,349.309,392.089,440.000,493.858,

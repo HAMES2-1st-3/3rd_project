@@ -43,9 +43,9 @@
 /***********************************************************************/
 /*Variable*/
 /***********************************************************************/
-IfxAsclin_Asc g_asclin3;
-uint8 g_asclin3_tx_buf[ASC3_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
-uint8 g_asclin3_rx_buf[ASC3_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
+static IfxAsclin_Asc s_asclin3;
+static uint8 s_asclin3_tx_buf[ASC3_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
+static uint8 s_asclin3_rx_buf[ASC3_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 
 /***********************************************************************/
 /*Function*/
@@ -62,27 +62,21 @@ void usb_printf(pchar format,...)
     va_end(args);
     count = (Ifx_SizeT)strlen(message);
     IFX_ASSERT(IFX_VERBOSE_LEVEL_ERROR, count < STDIF_DPIPE_MAX_PRINT_SIZE);
-    usb_print_string(message, USB_UART_MAX_PRINT_SIZE);
-    //return
-}
 
-
-
-void usb_print_string(char *str, uint32 max_len) {
-    uint32 count = 0;
-
-    char ch = *str;
-    while(ch != 0 && count < max_len) {
+    char *ch_ptr = message;
+    char ch = *ch_ptr;
+    while(ch != 0) {
         if(ch == '\n') {
-            IfxAsclin_Asc_blockingWrite(&g_asclin3, '\r');
-            IfxAsclin_Asc_blockingWrite(&g_asclin3, '\n');
+            IfxAsclin_Asc_blockingWrite(&s_asclin3, '\r');
+            IfxAsclin_Asc_blockingWrite(&s_asclin3, '\n');
         } else {
-            IfxAsclin_Asc_blockingWrite(&g_asclin3, ch);
+            IfxAsclin_Asc_blockingWrite(&s_asclin3, ch);
         }
-        str++;
-        max_len++;
-        ch = *str;
+        ch_ptr++;
+        ch = *ch_ptr;
     }
+
+    //return
 }
 
 void init_usb() {
@@ -122,13 +116,13 @@ void init_usb() {
     asc_conf.pins = &pins;
 
     /* FIFO buffers configuration */
-    asc_conf.txBuffer = g_asclin3_tx_buf;                      /* Set the transmission buffer                          */
+    asc_conf.txBuffer = s_asclin3_tx_buf;                      /* Set the transmission buffer                          */
     asc_conf.txBufferSize = ASC3_TX_BUFFER_SIZE;              /* Set the transmission buffer size                     */
-    asc_conf.rxBuffer = g_asclin3_rx_buf;                      /* Set the receiving buffer                             */
+    asc_conf.rxBuffer = s_asclin3_rx_buf;                      /* Set the receiving buffer                             */
     asc_conf.rxBufferSize = ASC3_RX_BUFFER_SIZE;              /* Set the receiving buffer size                        */
 
     /* Init ASCLIN module */
-    IfxAsclin_Asc_initModule(&g_asclin3, &asc_conf);          /* Initialize the module with the given configuration   */
+    IfxAsclin_Asc_initModule(&s_asclin3, &asc_conf);          /* Initialize the module with the given configuration   */
 
 }
 
@@ -137,14 +131,14 @@ void init_usb() {
 IFX_INTERRUPT(asclin3_tx_ISR, 0, ISR_PRIORITY_ASCLIN3_TX);
 void asclin3_tx_ISR(void)
 {
-    IfxAsclin_Asc_isrTransmit(&g_asclin3);
-    // ì´ê²Œ ì—†ìœ¼ë©´ ì²« ë¬¸ìžë§Œ ë³´ë‚´ì§€ê³  ê·¸ ì´í›„ì—ëŠ” ì „ì†¡ì´ ì•ˆë¨.
+    IfxAsclin_Asc_isrTransmit(&s_asclin3);
+    // ÀÌ°Ô ¾øÀ¸¸é Ã¹ ¹®ÀÚ¸¸ º¸³»Áö°í ±× ÀÌÈÄ¿¡´Â Àü¼ÛÀÌ ¾ÈµÊ.
 }
 
 IFX_INTERRUPT(asclin3_rx_ISR, 0, ISR_PRIORITY_ASCLIN3_RX);
 void asclin3_rx_ISR(void)
 {
-    IfxAsclin_Asc_isrReceive(&g_asclin3);
+    IfxAsclin_Asc_isrReceive(&s_asclin3);
 }
 
 IFX_INTERRUPT(asclin3_err_ISR, 0, ISR_PRIORITY_ASCLIN3_ER);

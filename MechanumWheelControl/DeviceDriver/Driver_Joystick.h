@@ -50,14 +50,14 @@ typedef enum{
 }ADC_GROUP2;
 
 
-typedef struct{ //ì„¼ì‹± ë³€ìˆ˜
+typedef struct{ //¼¾½Ì º¯¼ö
         uint32 UlSSense1_Raw;
         uint32 UlSSense2_Raw;
         uint32 UlSSense3_Raw;
 }SensorAdcRaw;
 
-extern SensorAdcRaw g_adc0_raw; //ì „ë ¥ ì„¼ì‹± ë³€ìˆ˜
-extern SensorAdcRaw g_adc2_raw; //ì „ë ¥ ì„¼ì‹± ë³€ìˆ˜
+extern SensorAdcRaw g_adc0_raw; //Àü·Â ¼¾½Ì º¯¼ö
+extern SensorAdcRaw g_adc2_raw; //Àü·Â ¼¾½Ì º¯¼ö
 
 /***********************************************************************/
 /*Define*/
