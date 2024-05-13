@@ -3,6 +3,34 @@
 /***********************************************************************/
 #include <AppMode.h>
 #include <AppScheduling.h>
+
+#include <Driver_Stm.h>
+
+#include <Control_Buzzer.h>
+#include <Control_Motor.h>
+
+#include <Decision_RPM.h>
+#include <Decision_State.h>
+#include <Decision_Sub_State.h>
+
+/*****test******/
+
+#include <Driver_Joystick.h>
+#include <Driver_Potentiometer.h>
+#include <Driver_ToF.h>
+#include <Driver_USB.h>
+
+#include <Driver_Buzzer.h>
+#include <Driver_WheelFL.h>
+#include <Driver_WheelFR.h>
+#include <Driver_WheelRL.h>
+#include <Driver_WheelRR.h>
+
+
+
+/*****************/
+
+
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -10,12 +38,8 @@
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
-typedef struct
-{
-    uint32 u32nuCnt1ms;
-    uint32 u32nuCnt10ms;
-    uint32 u32nuCnt100ms;
-}TestCnt;
+
+
 /***********************************************************************/
 /*Static Function Prototype*/ 
 /***********************************************************************/
@@ -29,8 +53,8 @@ static void AppTask500ms(void);
 /***********************************************************************/
 /*Variable*/ 
 /***********************************************************************/
-TestCnt g_test_cnt;
-uint32 g_sub_state;
+
+uint8 g_sub_state;
 uint32 g_rpm_ref;
 /***********************************************************************/
 /*Function*/ 
@@ -38,25 +62,47 @@ uint32 g_rpm_ref;
 
 static void AppTask1ms(void)
 {
-    g_test_cnt.u32nuCnt1ms++;
+
 }
 
 static void AppTask10ms(void)
 {
-    g_test_cnt.u32nuCnt10ms++;
-    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
+//    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
 {
-    g_rpm_ref = get_rpm_reference();
+//    g_rpm_ref = get_rpm_reference();
+
+
 }
 static void AppTask50ms(void)
 {
+    { // for test
+    uint32 temp = get_potentiometer_value();
+
+    set_wheelFL_dutycycle((float32)temp / 4095 * 200 - 100);
+    set_wheelFR_dutycycle((float32)temp / 4095 * 200 - 100);
+    set_wheelRL_dutycycle((float32)temp / 4095 * 200 - 100);
+    set_wheelRR_dutycycle((float32)temp / 4095 * 200 - 100);
+
+//    usb_printf("P:%d, FL:%d, FR:%d, RL:%d, RR:%d, Tof:%d\n",
+//            get_potentiometer_value(),
+//            get_wheelFL_tick(),
+//            get_wheelFR_tick(),
+//            get_wheelRL_tick(),
+//            get_wheelRR_tick(),
+//            get_tof_distance());
+    usb_printf("JoyM_x:%u, JoyM_y:%u, JoyR_x:%u, JoyR_y:%u\n",
+            get_mid_adc_group0_raw()->UlSSense1_Raw,
+            get_mid_adc_group0_raw()->UlSSense2_Raw,
+            get_mid_adc_group2_raw()->UlSSense1_Raw,
+            get_mid_adc_group2_raw()->UlSSense2_Raw);
+    }
 
 }
 static void AppTask100ms(void)
 {
-    g_test_cnt.u32nuCnt100ms++;
+
 }
 static void AppTask250ms(void)
 {
@@ -64,7 +110,7 @@ static void AppTask250ms(void)
 }
 static void AppTask500ms(void)
 {
-
+//    toggle_buzzer();
 }
 static void AppNoTask()
 {
@@ -102,7 +148,7 @@ void AppScheduling(void)
         if(g_scheduling_info.scheduling_flag_250ms == 1u)
         {
             g_scheduling_info.scheduling_flag_250ms = 0u;
-            AppTask100ms();
+            AppTask250ms();
         }
         if(g_scheduling_info.scheduling_flag_500ms == 1u)
         {

@@ -41,6 +41,6 @@
 /*Global Function Prototype*/
 /***********************************************************************/
 
-int get_state(void);
+uint32 get_state(void);
 
 #endif /* DECISION_STATE_H_ */

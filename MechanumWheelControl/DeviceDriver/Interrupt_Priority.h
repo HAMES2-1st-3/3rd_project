@@ -18,5 +18,10 @@
 #define ISR_PRIORITY_ASCLIN3_RX      0x30                                       /* Priority for interrupt ISR Receive   */
 #define ISR_PRIORITY_ASCLIN3_ER      0x32
 
+#define ISR_PRIORITY_SCUERU0        0x10
+#define ISR_PRIORITY_SCUERU1        0x11
+#define ISR_PRIORITY_SCUERU2        0x12
+#define ISR_PRIORITY_SCUERU3        0x13
+
 
 #endif /* DEVICEDRIVER_INTERRUPT_PRIORITY_H_ */

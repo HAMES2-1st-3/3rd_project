@@ -36,7 +36,7 @@ extern SchedulingFlag g_scheduling_info;
 /***********************************************************************/
 /*Global Function Prototype*/ 
 /***********************************************************************/
-extern void Driver_Stm_Init(void);
+void init_stm(void);
 
 
 #endif /* DRIVER_STM */
