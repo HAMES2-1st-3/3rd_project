@@ -5,22 +5,18 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Control/Control_Buzzer.c \
-../Control/Control_LED.c \
 ../Control/Control_Motor.c 
 
 COMPILED_SRCS += \
 ./Control/Control_Buzzer.src \
-./Control/Control_LED.src \
 ./Control/Control_Motor.src 
 
 C_DEPS += \
 ./Control/Control_Buzzer.d \
-./Control/Control_LED.d \
 ./Control/Control_Motor.d 
 
 OBJS += \
 ./Control/Control_Buzzer.o \
-./Control/Control_LED.o \
 ./Control/Control_Motor.o 
 
 
@@ -40,13 +36,6 @@ Control/Control_Buzzer.o: ./Control/Control_Buzzer.src Control/subdir.mk
 	@echo 'Finished building: $<'
 	@echo ' '
 
-Control/Control_LED.o: ./Control/Control_LED.src Control/subdir.mk
-	@echo 'Building file: $<'
-	@echo 'Invoking: TASKING Assembler'
-	astc -Og -Os --no-warnings= --error-limit=42 -o  "$@" "$<"
-	@echo 'Finished building: $<'
-	@echo ' '
-
 Control/Control_Motor.o: ./Control/Control_Motor.src Control/subdir.mk
 	@echo 'Building file: $<'
 	@echo 'Invoking: TASKING Assembler'
@@ -58,7 +47,7 @@ Control/Control_Motor.o: ./Control/Control_Motor.src Control/subdir.mk
 clean: clean-Control
 
 clean-Control:
-	-$(RM) ./Control/Control_Buzzer.d ./Control/Control_Buzzer.o ./Control/Control_Buzzer.src ./Control/Control_LED.d ./Control/Control_LED.o ./Control/Control_LED.src ./Control/Control_Motor.d ./Control/Control_Motor.o ./Control/Control_Motor.src
+	-$(RM) ./Control/Control_Buzzer.d ./Control/Control_Buzzer.o ./Control/Control_Buzzer.src ./Control/Control_Motor.d ./Control/Control_Motor.o ./Control/Control_Motor.src
 
 .PHONY: clean-Control
 

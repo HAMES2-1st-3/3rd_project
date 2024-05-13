@@ -27,7 +27,7 @@
 #include "Ifx_Types.h"
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
-#include <App/AppScheduling.h>
+#include <AppScheduling.h>
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
 void core0_main(void)
@@ -48,6 +48,8 @@ void core0_main(void)
     /* Initialize Device Driver */
     init_tof();
     init_potentiometer();
+    init_buzzer();
+    init_joystick();
     while(1)
     {
         AppScheduling();

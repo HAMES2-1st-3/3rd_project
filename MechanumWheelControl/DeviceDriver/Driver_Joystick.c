@@ -1,7 +1,13 @@
+/*
+ * Driver_Joystick.c
+ *
+ *  Created on: 2024. 5. 10.
+ *      Author: howon
+ */
 /***********************************************************************/
 /*Include*/
 /***********************************************************************/
-#include "Driver_Joystick.h"
+#include <Driver_Joystick.h>
 
 /***********************************************************************/
 /*Define*/
@@ -19,33 +25,32 @@ typedef struct
 /***********************************************************************/
 /*Static Function Prototype*/
 /***********************************************************************/
-static void Driver_Adc0_Init(void);
-static void Driver_Adc2_Init(void);
-static void DrvAdc_Group0ChannelInit(uint8 param_ChNum);
-static void DrvAdc_Group2ChannelInit(uint8 param_ChNum);
+static void init_adc0(void);
+static void init_adc2(void);
+static void init_group0_channel(uint8 param_ChNum);
+static void init_group2_channel(uint8 param_ChNum);
 
 /***********************************************************************/
 /*Variable*/
 /***********************************************************************/
-App_VadcAutoScan g_VadcAutoScan; //ADC 모듈 변수
-App_VadcAutoScan g_VadcAutoScan2; //ADC 모듈 변수
-IfxVadc_Adc_Channel adc0Channel[ADC_GROUP0_MAX];
-SensorAdcRaw stSensorAdc0Raw; //adc raw 값 받을 변수
-SensorAdcRaw stSensorAdc2Raw; //adc raw 값 받을 변수
-IfxVadc_Adc_ChannelConfig adcChannelConfig[ADC_GROUP0_MAX];
+App_VadcAutoScan s_vadc_autoscan0; //ADC 모듈 변수
+App_VadcAutoScan s_vadc_autoscan2; //ADC 모듈 변수
+static IfxVadc_Adc_Channel s_adc0_channel[ADC_GROUP0_MAX];
+SensorAdcRaw g_adc0_raw; //adc raw 값 받을 변수
+SensorAdcRaw g_adc2_raw; //adc raw 값 받을 변수
 
 /***********************************************************************/
 /*Function*/
 /***********************************************************************/
 
-void Init_Joystick(void)
+void init_joystick(void)
 {
     /*ADC0 Converter Init*/
-    Driver_Adc0_Init();
-    Driver_Adc2_Init();
+    init_adc0();
+    init_adc2();
 }
 
-static void Driver_Adc2_Init(void)
+static void init_adc0(void)
 {
 
     /* VADC Configuration */
@@ -55,51 +60,11 @@ static void Driver_Adc2_Init(void)
     IfxVadc_Adc_initModuleConfig(&adcConfig, &MODULE_VADC);
 
     /* initialize module */
-    IfxVadc_Adc_initModule(&g_VadcAutoScan.vadc, &adcConfig);
+    IfxVadc_Adc_initModule(&s_vadc_autoscan0.vadc, &adcConfig);
 
     /* create group config */
     IfxVadc_Adc_GroupConfig adcGroupConfig;
-    IfxVadc_Adc_initGroupConfig(&adcGroupConfig, &g_VadcAutoScan.vadc);
-
-    /* with group 0 */
-    adcGroupConfig.groupId = IfxVadc_GroupId_2;
-    adcGroupConfig.master  = adcGroupConfig.groupId;
-
-    /* enable scan source */
-    adcGroupConfig.arbiter.requestSlotScanEnabled = TRUE;
-
-    /* enable auto scan */
-    adcGroupConfig.scanRequest.autoscanEnabled = TRUE;
-
-    /* enable all gates in "always" mode (no edge detection) */
-    adcGroupConfig.scanRequest.triggerConfig.gatingMode = IfxVadc_GatingMode_always;
-
-    /* initialize the group */
-    /*IfxVadc_Adc_Group adcGroup;*/    //declared globally
-    IfxVadc_Adc_initGroup(&g_VadcAutoScan.adcGroup, &adcGroupConfig);
-
-    DrvAdc_Group2ChannelInit(ADC_GROUP2_CH5);
-    DrvAdc_Group2ChannelInit(ADC_GROUP2_CH4); //channel init
-
-    IfxVadc_Adc_startScan(&g_VadcAutoScan.adcGroup);
-
-}
-
-static void Driver_Adc0_Init(void)
-{
-
-    /* VADC Configuration */
-
-    /* create configuration */
-    IfxVadc_Adc_Config adcConfig;
-    IfxVadc_Adc_initModuleConfig(&adcConfig, &MODULE_VADC);
-
-    /* initialize module */
-    IfxVadc_Adc_initModule(&g_VadcAutoScan2.vadc, &adcConfig);
-
-    /* create group config */
-    IfxVadc_Adc_GroupConfig adcGroupConfig;
-    IfxVadc_Adc_initGroupConfig(&adcGroupConfig, &g_VadcAutoScan2.vadc);
+    IfxVadc_Adc_initGroupConfig(&adcGroupConfig, &s_vadc_autoscan0.vadc);
 
     /* with group 0 */
     adcGroupConfig.groupId = IfxVadc_GroupId_0;
@@ -116,77 +81,115 @@ static void Driver_Adc0_Init(void)
 
     /* initialize the group */
     /*IfxVadc_Adc_Group adcGroup;*/    //declared globally
-    IfxVadc_Adc_initGroup(&g_VadcAutoScan2.adcGroup, &adcGroupConfig);
+    IfxVadc_Adc_initGroup(&s_vadc_autoscan0.adcGroup, &adcGroupConfig);
 
-    DrvAdc_Group0ChannelInit(ADC_GROUP0_CH3);
-    DrvAdc_Group0ChannelInit(ADC_GROUP0_CH2); //channel init
+    init_group0_channel(ADC_GROUP0_CH3);
+    init_group0_channel(ADC_GROUP0_CH2); //channel init
 
-    IfxVadc_Adc_startScan(&g_VadcAutoScan2.adcGroup);
+    IfxVadc_Adc_startScan(&s_vadc_autoscan0.adcGroup);
+
+}
+
+static void init_adc2(void)
+{
+
+    /* VADC Configuration */
+
+    /* create configuration */
+    IfxVadc_Adc_Config adcConfig;
+    IfxVadc_Adc_initModuleConfig(&adcConfig, &MODULE_VADC);
+
+    /* initialize module */
+    IfxVadc_Adc_initModule(&s_vadc_autoscan2.vadc, &adcConfig);
+
+    /* create group config */
+    IfxVadc_Adc_GroupConfig adcGroupConfig;
+    IfxVadc_Adc_initGroupConfig(&adcGroupConfig, &s_vadc_autoscan2.vadc);
+
+    /* with group 0 */
+    adcGroupConfig.groupId = IfxVadc_GroupId_2;
+    adcGroupConfig.master  = adcGroupConfig.groupId;
+
+    /* enable scan source */
+    adcGroupConfig.arbiter.requestSlotScanEnabled = TRUE;
+
+    /* enable auto scan */
+    adcGroupConfig.scanRequest.autoscanEnabled = TRUE;
+
+    /* enable all gates in "always" mode (no edge detection) */
+    adcGroupConfig.scanRequest.triggerConfig.gatingMode = IfxVadc_GatingMode_always;
+
+    /* initialize the group */
+    /*IfxVadc_Adc_Group adcGroup;*/    //declared globally
+    IfxVadc_Adc_initGroup(&s_vadc_autoscan2.adcGroup, &adcGroupConfig);
+
+    init_group2_channel(ADC_GROUP2_CH5);
+    init_group2_channel(ADC_GROUP2_CH4); //channel init
+
+    IfxVadc_Adc_startScan(&s_vadc_autoscan2.adcGroup);
 
 }
 
 
-
-static void DrvAdc_Group2ChannelInit(uint8 param_ChNum)
+static void init_group0_channel(uint8 param_ChNum)
 {
-    IfxVadc_Adc_ChannelConfig adcChannelConfigInfo;
+    IfxVadc_Adc_ChannelConfig g_adc_channel_configInfo;
     uint32 ulTemp = ((uint32)1u<<param_ChNum);
 
-    IfxVadc_Adc_initChannelConfig(&adcChannelConfigInfo,&g_VadcAutoScan.adcGroup);
+    IfxVadc_Adc_initChannelConfig(&g_adc_channel_configInfo,&s_vadc_autoscan0.adcGroup);
 
-    adcChannelConfigInfo.channelId = (IfxVadc_ChannelId)(param_ChNum);
-    adcChannelConfigInfo.resultRegister = (IfxVadc_ChannelResult)(param_ChNum);
+    g_adc_channel_configInfo.channelId = (IfxVadc_ChannelId)(param_ChNum);
+    g_adc_channel_configInfo.resultRegister = (IfxVadc_ChannelResult)(param_ChNum);
 
     /*Initialize the channel*/
-    IfxVadc_Adc_initChannel(&adc0Channel[param_ChNum],&adcChannelConfigInfo);
+    IfxVadc_Adc_initChannel(&s_adc0_channel[param_ChNum],&g_adc_channel_configInfo);
 
     /*add to scan*/
-    IfxVadc_Adc_setScan(&g_VadcAutoScan.adcGroup,ulTemp,ulTemp);
+    IfxVadc_Adc_setScan(&s_vadc_autoscan0.adcGroup,ulTemp,ulTemp);
 
 }
 
-static void DrvAdc_Group0ChannelInit(uint8 param_ChNum)
+static void init_group2_channel(uint8 param_ChNum)
 {
-    IfxVadc_Adc_ChannelConfig adcChannelConfigInfo;
+    IfxVadc_Adc_ChannelConfig g_adc_channel_configInfo;
     uint32 ulTemp = ((uint32)1u<<param_ChNum);
 
-    IfxVadc_Adc_initChannelConfig(&adcChannelConfigInfo,&g_VadcAutoScan2.adcGroup);
+    IfxVadc_Adc_initChannelConfig(&g_adc_channel_configInfo,&s_vadc_autoscan2.adcGroup);
 
-    adcChannelConfigInfo.channelId = (IfxVadc_ChannelId)(param_ChNum);
-    adcChannelConfigInfo.resultRegister = (IfxVadc_ChannelResult)(param_ChNum);
+    g_adc_channel_configInfo.channelId = (IfxVadc_ChannelId)(param_ChNum);
+    g_adc_channel_configInfo.resultRegister = (IfxVadc_ChannelResult)(param_ChNum);
 
     /*Initialize the channel*/
-    IfxVadc_Adc_initChannel(&adc0Channel[param_ChNum],&adcChannelConfigInfo);
+    IfxVadc_Adc_initChannel(&s_adc0_channel[param_ChNum],&g_adc_channel_configInfo);
 
     /*add to scan*/
-    IfxVadc_Adc_setScan(&g_VadcAutoScan2.adcGroup,ulTemp,ulTemp);
+    IfxVadc_Adc_setScan(&s_vadc_autoscan2.adcGroup,ulTemp,ulTemp);
 
 }
 
-void DrvAdc_GetAdcRawGroup2(void){
+void get_adc_group0_raw(void){
 
-    Ifx_VADC_RES conversionResult;
-
-
-    conversionResult=IfxVadc_Adc_getResult(&adc0Channel[ADC_GROUP2_CH5]); //x_val
-    stSensorAdc2Raw.UlSSense1_Raw=conversionResult.B.RESULT;
-    conversionResult=IfxVadc_Adc_getResult(&adc0Channel[ADC_GROUP2_CH4]); //y_val
-    stSensorAdc2Raw.UlSSense2_Raw=conversionResult.B.RESULT;
-
-    IfxVadc_Adc_startScan(&g_VadcAutoScan.adcGroup);
-}
-
-void DrvAdc_GetAdcRawGroup0(void){
-
-    Ifx_VADC_RES conversionResult;
+    Ifx_VADC_RES conversion_res;
 
 
-    conversionResult=IfxVadc_Adc_getResult(&adc0Channel[ADC_GROUP0_CH3]); //x_val
-    stSensorAdc0Raw.UlSSense1_Raw=conversionResult.B.RESULT;
-    conversionResult=IfxVadc_Adc_getResult(&adc0Channel[ADC_GROUP0_CH2]); //y_val
-    stSensorAdc0Raw.UlSSense2_Raw=conversionResult.B.RESULT;
+    conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP0_CH3]); //x_val
+    g_adc0_raw.UlSSense1_Raw=conversion_res.B.RESULT;
+    conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP0_CH2]); //y_val
+    g_adc0_raw.UlSSense2_Raw=conversion_res.B.RESULT;
 
-    IfxVadc_Adc_startScan(&g_VadcAutoScan2.adcGroup);
+    IfxVadc_Adc_startScan(&s_vadc_autoscan0.adcGroup);
 }
 
 
+void get_adc_group2_raw(void){
+
+    Ifx_VADC_RES conversion_res;
+
+
+    conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP2_CH5]); //x_val
+    g_adc2_raw.UlSSense1_Raw=conversion_res.B.RESULT;
+    conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP2_CH4]); //y_val
+    g_adc2_raw.UlSSense2_Raw=conversion_res.B.RESULT;
+
+    IfxVadc_Adc_startScan(&s_vadc_autoscan2.adcGroup);
+}
