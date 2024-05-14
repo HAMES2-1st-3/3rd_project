@@ -60,37 +60,37 @@ uint32 get_state(void)
     g_move_y_val= move_raw->UlSSense2_Raw;
 
     if(g_move_x_val <= 1570 && g_move_y_val <= 1570){
-        s_state = 0;
-    }
-    else if(g_move_x_val >=3350 && g_move_y_val <= 1570){
         s_state = 2;
     }
+    else if(g_move_x_val >=3350 && g_move_y_val <= 1570){
+        s_state = 0;
+    }
     else if(g_move_x_val <=1570 && g_move_y_val > 3350){
-        s_state = 6;
+        s_state = 8;
     }
     else if(g_move_x_val >= 3350 && g_move_y_val > 3350){
-        s_state = 8;
+        s_state = 6;
     }
     else if(g_move_x_val < 3350 && g_move_y_val < 1570){
         s_state = 1;
     }
     else if(g_move_x_val >= 3350 && g_move_y_val <= 3350){
-        s_state = 5;
+        s_state = 3;
     }
     else if(g_move_x_val < 3350 && g_move_y_val > 3350){
         s_state = 7;
     }
     else if(g_move_x_val <= 1570 && g_move_y_val <= 3350){
-        s_state = 3;
+        s_state = 5;
     }
     else {
         g_rotate_x_val= rotate_raw->UlSSense1_Raw;
         g_rotate_y_val= rotate_raw->UlSSense2_Raw;
         if(g_rotate_x_val>=3350 && g_rotate_y_val<3350 &&g_rotate_y_val>=1570){
-            s_state = 9;
+            s_state = 10;
         }
         else if(g_rotate_x_val<=1570 &&g_rotate_y_val<3350 &&g_rotate_y_val>=1570){
-            s_state = 10;
+            s_state = 9;
         }
         else s_state =4;
     }

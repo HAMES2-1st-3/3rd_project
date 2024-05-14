@@ -123,12 +123,13 @@ void init_wheelFR(void){
 
 /* duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002% */
 void set_wheelFR_dutycycle(float32 dutycycle) { // dutycycle : 100f ~ -100f
-    set_motorFR_dutycycle(dutycycle);
+
 
 #if MOTOR_FORWARD_DIR == 1
     if(dutycycle >= 0) {
         set_motorFR_direction(1);
     } else {
+        dutycycle *= -1;
         set_motorFR_direction(0);
     }
 #else
@@ -138,6 +139,7 @@ void set_wheelFR_dutycycle(float32 dutycycle) { // dutycycle : 100f ~ -100f
         set_motorFR_direction(1);
     }
 #endif
+    set_motorFR_dutycycle(dutycycle);
 }
 
 
@@ -206,7 +208,7 @@ void init_motorFR(void) {
 
 
 static inline void set_motorFR_dutycycle(float32 dutycycle){ // 0% ~ 100%
-    s_tomConfig_motor.dutyCycle = dutycycle / 100 * PWM_PERIOD;                 /* Change the value of the duty cycle           */
+    s_tomConfig_motor.dutyCycle = (uint16)(dutycycle / 100 * PWM_PERIOD);                 /* Change the value of the duty cycle           */
     IfxGtm_Tom_Pwm_init(&s_tomDriver_motor, &s_tomConfig_motor);
 }
 

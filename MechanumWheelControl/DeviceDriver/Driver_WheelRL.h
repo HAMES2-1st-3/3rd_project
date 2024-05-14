@@ -71,7 +71,7 @@ boolean get_wheelRL_direction(void);
 
 sint32 get_wheelRL_tick(void);
 
-
+float32 get_motorRL_speed_bare(void);
 
 void init_motorRL(void);
 void init_encoderRL(void);

@@ -123,7 +123,6 @@ void init_wheelRL(void){
 
 /* duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002% */
 void set_wheelRL_dutycycle(float32 dutycycle) { // dutycycle : 100f ~ -100f
-    set_motorRL_dutycycle(dutycycle);
 
 #if MOTOR_FORWARD_DIR == 1
     if(dutycycle >= 0) {
@@ -136,8 +135,10 @@ void set_wheelRL_dutycycle(float32 dutycycle) { // dutycycle : 100f ~ -100f
         set_motorRL_direction(0);
     } else {
         set_motorRL_direction(1);
+        dutycycle *= -1;
     }
 #endif
+    set_motorRL_dutycycle(dutycycle);
 }
 
 
@@ -206,7 +207,7 @@ void init_motorRL(void) {
 
 
 static inline void set_motorRL_dutycycle(float32 dutycycle){ // 0% ~ 100%
-    s_tomConfig_motor.dutyCycle = dutycycle / 100 * PWM_PERIOD;                 /* Change the value of the duty cycle           */
+    s_tomConfig_motor.dutyCycle = (uint16)(dutycycle / 100 * PWM_PERIOD);                 /* Change the value of the duty cycle           */
     IfxGtm_Tom_Pwm_init(&s_tomDriver_motor, &s_tomConfig_motor);
 }
 
@@ -225,6 +226,11 @@ static inline void set_motorRL_direction(boolean clock_wise){ // 1 : CW, 0: CCW
 static inline float32 get_motorRL_speed(void) {
     return s_tomConfig_motor.dutyCycle * 100 / PWM_PERIOD;
 }
+
+float32 get_motorRL_speed_bare(void) {
+    return (float32)(s_tomConfig_motor.dutyCycle);
+}
+
 
 // 1 : CW, 0 : CCW
 static inline boolean get_motorRL_direction(void){

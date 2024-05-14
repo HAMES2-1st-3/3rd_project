@@ -1,20 +1,20 @@
 /*
  * Control_.c
  *
- *  Created on: 2024. 5. 10.
- *      Author: user
+ *  Created on: 2024. 5. 13.
+ *      Author: taewon
  *
- *  ÇÊ¿ä ÇÔ¼ö ¹× ±â´É
+ *  ï¿½Ê¿ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
  *    void FUNC(int32 state, int32 sub_state, float32 ref_rpm);
- *     - ref_rpm¸¦ ÅëÇØ ¸ñÇ¥ rpm ¼³Á¤
- *     - state¸¦ ÅëÇØ ³×°³ÀÇ ¸ğÅÍ °¢°¢ÀÇ rpm ¹× ¹æÇâ ¼³Á¤
- *     - sub_state¸¦ ÅëÇØ slow, stopÀÎ °æ¿ì rpm ¹× ¹æÇâ Àç¼³Á¤
+ *     - ref_rpmï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ rpm ï¿½ï¿½ï¿½ï¿½
+ *     - stateï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ rpm ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+ *     - sub_stateï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ slow, stopï¿½ï¿½ ï¿½ï¿½ï¿½ rpm ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ç¼³ï¿½ï¿½
  *
- *    float32 PID(float32 ref, float32 cur, float32 kp, float32 ki, float32 Ts)
- *     - PI Á¦¾î ÇÔ¼ö
+ *    wheel_rpms PID(wheel_rpms g_ref_rpm, wheel_rpms g_cur_rpm, float32 kp, float32 ki, float32 Ts)
+ *     - PI ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
  *
- *    float32 LPF(float32 Y_fill_d,float32 u,float32 cf,float32 T){ // cf=cutoff
- *     - Low-Pass Filter ±¸Çö
+ *    float32 LPF(float32 Y_prev,float32 u,float32 cf,float32 T){ // cf=cutoff
+ *     - Low-Pass Filter ï¿½ï¿½ï¿½ï¿½
  *
  *     -> Driver_1.h, Driver_2.h, Driver_3.h, Driver_4.h
  */
@@ -24,7 +24,7 @@
 /*Include*/ 
 /***********************************************************************/
 #include "Control_Motor.h"
-
+#include <stdint.h>
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -32,81 +32,179 @@
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
-typedef struct{ //¼¾½Ì º¯¼ö
-        uint32 fl_rpm;
-        uint32 fr_rpm;
-        uint32 rr_rpm;
-        uint32 rl_rpm;
-}setrpm;
-/***********************************************************************/
-/*Static Function Prototype*/ 
-/***********************************************************************/
+typedef struct{ //value of reference RPM for each wheels
+        sint32 fl;
+        sint32 fr;
+        sint32 rr;
+        sint32 rl;
+}wheel_rpms;
+
+typedef struct {
+    float32 fl_err;
+    float32 fr_err;
+    float32 rr_err;
+    float32 rl_err;
+
+    float32 fl_I_err;
+    float32 fr_I_err;
+    float32 rr_I_err;
+    float32 rl_I_err;
+} control_errors;
 
 /***********************************************************************/
-/*Variable*/ 
+/*Static Function Prototype*/
 /***********************************************************************/
-setrpm g_motor;
+void update_wheel_rpm(wheel_rpms sensor_rpm, float32 cf, float32 T);
+float32 LPF(float32 Y_prev, float32 u, float32 cf, float32 T);
+wheel_rpms PID(wheel_rpms g_ref_rpm, wheel_rpms g_cur_rpm, float32 kp, float32 ki, float32 Ts);
+
 /***********************************************************************/
+
+/*Variable*/
+/***********************************************************************/
+
+static control_errors g_errors = {0};// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼
+static wheel_rpms g_filtered_rpm;// value after LPF
+static wheel_rpms g_ref_rpm;//value of reference RPM for each wheels
+static wheel_rpms g_cur_rpm;//value of current RPM for each wheels
+wheel_rpms control_output;//value of duty cycle for each wheels
+
+/***********************************************************************/
+
 /*Function*/ 
 /***********************************************************************/
 
-void set_all_wheel(uint8 state, uint8 sub_state, uint32 ref_rpm)
-{
-    //fl_rpm
-    if(state ==0 || state ==4|| state==8){
-        g_motor.fl_rpm = 0;
-    }else if(state ==1 ||state ==2||state ==5||state ==10){
-        IfxPort_setPinLow(IfxPort_P10_1.port, IfxPort_P10_1.pinIndex); //¼ø¹æÇâ
-        if(sub_state ==1) g_motor.fl_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.fl_rpm=0;
-    }else {
-        IfxPort_setPinHigh(IfxPort_P10_1.port, IfxPort_P10_1.pinIndex); //¿ª¹æÇâ
-        if(sub_state ==1) g_motor.fl_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.fl_rpm=0;
-    }
+void update_wheel_rpm(wheel_rpms sensor_rpm, float32 cf, float32 T) {
+    // update LPF to 4 wheels
+    g_filtered_rpm.fl = LPF(g_filtered_rpm.fl, sensor_rpm.fl, cf, T);
+    g_filtered_rpm.fr = LPF(g_filtered_rpm.fr, sensor_rpm.fr, cf, T);
+    g_filtered_rpm.rl = LPF(g_filtered_rpm.rl, sensor_rpm.rl, cf, T);
+    g_filtered_rpm.rr = LPF(g_filtered_rpm.rr, sensor_rpm.rr, cf, T);
+}
 
-    //fr_rpm
-    if(state ==2 || state ==4|| state==6){
-        g_motor.fr_rpm = 0;
-    }else if(state ==0 ||state ==1||state ==3||state ==9){
-        IfxPort_setPinLow(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex); //¼ø¹æÇâ
-        if(sub_state ==1) g_motor.fr_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.fr_rpm=0;
-    }else {
-        IfxPort_setPinHigh(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex); //¿ª¹æÇâ
-        if(sub_state ==1) g_motor.fr_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.fr_rpm=0;
-    }
 
-    //rl_rpm
-    if(state ==2 || state ==4|| state==6){
-        g_motor.rl_rpm = 0;
-    }else if(state ==0 ||state ==1||state ==3||state ==10){
-        IfxPort_setPinLow(IfxPort_P21_0.port, IfxPort_P21_0.pinIndex); //¼ø¹æÇâ
-        if(sub_state ==1) g_motor.rl_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.rl_rpm=0;
-    }else {
-        IfxPort_setPinHigh(IfxPort_P21_0.port, IfxPort_P21_0.pinIndex); //¿ª¹æÇâ
-        if(sub_state ==1) g_motor.rl_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.rl_rpm=0;
-    }
+float32 LPF(float32 Y_prev, float32 u, float32 cf, float32 T){
+    // RC: ì‹œê°„ ìƒìˆ˜ -> í•„í„°ì˜ ì‘ë‹µ ì†ë„ë¥¼ ê²°ì •. RC ê°’ì´ í¬ë©´ í•„í„°ê°€ ì €ì£¼íŒŒì— ë” ë¯¼ê°í•´ì§.
+    // cf (cutoff frequency)ê°€ ì‘ì„ìˆ˜ë¡ í•„í„°ì˜ ì‘ë‹µì´ ëŠë ¤ì§. ë‹¨ìœ„ëŠ” ì´ˆ(sec).
+    float32 RC = 1.0 / (2.0 * 3.14159 * cf);
 
-    //rr_rpm
-    if(state ==0 || state ==4 ||state==8){
-        g_motor.rr_rpm = 0;
-    }else if(state ==1 ||state ==2||state ==5||state ==9){
-        IfxPort_setPinLow(IfxPort_P33_1.port, IfxPort_P33_1.pinIndex); //¼ø¹æÇâ
-        if(sub_state ==1) g_motor.rr_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.rr_rpm=0;
-    }else {
-        IfxPort_setPinHigh(IfxPort_P33_1.port, IfxPort_P33_1.pinIndex); //¿ª¹æÇâ
-        if(sub_state ==1) g_motor.rr_rpm = ref_rpm/2;
-        else if(sub_state ==2)g_motor.rr_rpm=0;
-    }
+    // alphaëŠ” í•„í„° ê³„ìˆ˜ë¡œ, 0ê³¼ 1 ì‚¬ì´ì˜ ê°’ -> í•„í„°ì˜ ê°ë„ë¥¼ ê²°ì •
+    // Tê°€ ì‘ê±°ë‚˜ ê°™ì€ ì£¼ê¸°ì ì¸ ìƒ˜í”Œë§ì—ì„œ cfì— ë¹„í•´ ì¶©ë¶„íˆ ì‘ìœ¼ë©´ alpha ê°’ì´ ì»¤ì ¸ í•„í„°ì˜ íš¨ê³¼ê°€ ê°ì†Œ
+    float32 alpha = T / (T + RC);
+    // Y_currì€ í˜„ì¬ í•„í„°ëœ ì¶œë ¥ê°’ -> ì´ì „ ì¶œë ¥ê°’ Y_prevì™€ ì…ë ¥ê°’ u ì‚¬ì´ì˜ ê°€ì¤‘ í‰ê· ìœ¼ë¡œ ê³„ì‚°
+    // alphaê°€ 1ì— ê°€ê¹Œìš¸ìˆ˜ë¡ ì…ë ¥ uì— ë” ê°€ê¹Œì›Œì§
+    float32 Y_curr = Y_prev + alpha * (u - Y_prev);
+
+    return Y_curr;
 }
 
 
 
+void pi_control(float32 kp, float32 ki, float32 Ts){
+
+    g_errors.fl_err = g_ref_rpm.fl - g_cur_rpm.fl;
+    g_errors.fl_I_err += g_errors.fl_err * Ts;
+    control_output.fl = kp * g_errors.fl_err + ki * g_errors.fl_I_err;
+
+    //
+    g_errors.fr_err = g_ref_rpm.fr - g_cur_rpm.fr;
+    g_errors.fr_I_err += g_errors.fr_err * Ts;
+    control_output.fr = kp * g_errors.fr_err + ki * g_errors.fr_I_err;
+
+    //
+    g_errors.rl_err = g_ref_rpm.rl - g_cur_rpm.rl;
+    g_errors.rl_I_err += g_errors.rl_err * Ts;
+    control_output.rl = kp * g_errors.rl_err + ki * g_errors.rl_I_err;
+
+    //
+    g_errors.rr_err = g_ref_rpm.rr - g_cur_rpm.rr;
+    g_errors.rr_I_err += g_errors.rr_err * Ts;
+    control_output.rr = kp * g_errors.rr_err + ki * g_errors.rr_I_err;
+
+    set_wheelFL_dutycycle((float32)(control_output.fl + (float32)g_ref_rpm.fl/ 5300 * 100.0));
+    set_wheelFR_dutycycle((float32)(control_output.fr + (float32)g_ref_rpm.fr/ 5300 * 100.0));
+    set_wheelRL_dutycycle((float32)(control_output.rl + (float32)g_ref_rpm.rl/ 5300 * 100.0));
+    set_wheelRR_dutycycle((float32)(control_output.rr + (float32)g_ref_rpm.rr/ 5300 * 100.0));
 
 
+    return;
+}
 
+/*- state 0 ~ 10
+      - 0: Northwestward    1: Northward    2: Northeastward
+      - 3: Westward         4: Stop         5: Eastward
+      - 6: Southwestward    7: Southward    8: Southeastward
+
+      - 9: Counter-Clockwise    10: Clockwise
+
+    sub_state 0~2
+      - 0 : normal          1: slow         2: stop
+*/
+
+
+void set_all_wheel(uint8 state, uint8 sub_state, sint32 goal_rpm)
+{
+
+    //fl_rpm
+    if(state ==0 || state ==4|| state==8){
+        g_ref_rpm.fl = 0;
+    }else if(state ==1 ||state ==2||state ==5||state ==10){
+        //IfxPort_setPinLow(IfxPort_P10_1.port, IfxPort_P10_1.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.fl = goal_rpm/2;
+        else if(sub_state ==2)g_ref_rpm.fl=0;
+        else g_ref_rpm.fl = goal_rpm;
+    }else {
+        //IfxPort_setPinHigh(IfxPort_P10_1.port, IfxPort_P10_1.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.fl = goal_rpm/2 * -1;
+        else if(sub_state ==2)g_ref_rpm.fl=0;
+        else g_ref_rpm.fl = goal_rpm * -1;
+    }
+
+    //fr_rpm
+    if(state ==2 || state ==4|| state==6){
+        g_ref_rpm.fr = 0;
+    }else if(state ==0 ||state ==1||state ==3||state ==9){
+       // IfxPort_setPinLow(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.fr = goal_rpm/2;
+        else if(sub_state ==2)g_ref_rpm.fr=0;
+        else g_ref_rpm.fr = goal_rpm;
+    }else {
+        //IfxPort_setPinHigh(IfxPort_P10_2.port, IfxPort_P10_2.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.fr = goal_rpm/2 *-1;
+        else if(sub_state ==2)g_ref_rpm.fr=0;
+        else g_ref_rpm.fr = goal_rpm *-1;
+    }
+
+    //rl_rpm
+    if(state ==2 || state ==4|| state==6){
+        g_ref_rpm.rl = 0;
+    }else if(state ==0 ||state ==1||state ==3||state ==10){
+        //IfxPort_setPinLow(IfxPort_P21_0.port, IfxPort_P21_0.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.rl = goal_rpm/2;
+        else if(sub_state ==2)g_ref_rpm.rl=0;
+        else g_ref_rpm.rl = goal_rpm;
+    }else {
+        //IfxPort_setPinHigh(IfxPort_P21_0.port, IfxPort_P21_0.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.rl = goal_rpm/2 *-1;
+        else if(sub_state ==2)g_ref_rpm.rl=0;
+        else g_ref_rpm.rl = goal_rpm *-1;
+    }
+
+    //rr_rpm
+    if(state ==0 || state ==4 ||state==8){
+        g_ref_rpm.rr = 0;
+    }else if(state ==1 ||state ==2||state ==5||state ==9){
+        //IfxPort_setPinLow(IfxPort_P33_1.port, IfxPort_P33_1.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.rr = goal_rpm/2;
+        else if(sub_state ==2)g_ref_rpm.rr=0;
+        else g_ref_rpm.rr = goal_rpm;
+    }else {
+        //IfxPort_setPinHigh(IfxPort_P33_1.port, IfxPort_P33_1.pinIndex); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        if(sub_state ==1) g_ref_rpm.rr = goal_rpm/2 *-1;
+        else if(sub_state ==2)g_ref_rpm.rr=0;
+        else g_ref_rpm.rr = goal_rpm *-1;
+    }
+
+    g_cur_rpm = g_ref_rpm; //Test
+
+}

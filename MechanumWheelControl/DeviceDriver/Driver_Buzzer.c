@@ -16,6 +16,7 @@
 /*********************************************************************************************************************/
 
 #define BUZZER IfxGtm_TOM0_11_TOUT3_P02_3_OUT /* passive buzzer*/
+#define VOLUME 0.01
 /*********************************************************************************************************************/
 /*-------------------------------------------------Global variables--------------------------------------------------*/
 /*********************************************************************************************************************/
@@ -40,8 +41,8 @@ void init_buzzer(void)
 
     /* Initialize the configuration structure with default parameters */
     IfxGtm_Tom_Pwm_initConfig(&g_tom_config, &MODULE_GTM);
-    //±âº» À½ 444hz  index=12
-    //freq  µµ ·¹ ¹Ì ÆÄ ¼Ö ³ô³·ÀÌ
+    //ï¿½âº» ï¿½ï¿½ 444hz  index=12
+    //freq  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     float fBuzz[21]={130.812,146.832,164.813,174.614,195.997,220.000,246.941,261.686,293.724,329.724
                 ,349.309,392.089,440.000,493.858,523.225,587.275,659.187,698.376,783.884,880.000
         ,987.609
@@ -63,7 +64,7 @@ void init_buzzer(void)
 /* not use makesound()*/
 void makesound(uint16 soundIdx,float32 sound_intensity ){
 
-    //freq  µµ ·¹ ¹Ì ÆÄ ¼Ö ³ô³·ÀÌ
+    //freq  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     float fBuzz[21]={130.812,146.832,164.813,174.614,195.997,220.000,246.941
                 ,
                 261.686,293.724,329.724,349.309,392.089,440.000,493.858,
@@ -88,7 +89,7 @@ void set_buzzer_dutycycle(float32 sound_intensity) // 0~1
 
 void toggle_buzzer(void){
     if(g_tom_config.dutyCycle==0){
-        set_buzzer_dutycycle(0.5);
+        set_buzzer_dutycycle(VOLUME);
     }
     else{
         set_buzzer_dutycycle(0);
@@ -97,6 +98,6 @@ void toggle_buzzer(void){
 void stop_buzzer(void){
     set_buzzer_dutycycle(0);
 }
-void start_buzzer(void){ // start default 0.5
-    set_buzzer_dutycycle(0.5);
+void start_buzzer(void){ // start default 0.1
+    set_buzzer_dutycycle(VOLUME);
 }

@@ -25,7 +25,8 @@
 #include <Driver_WheelFR.h>
 #include <Driver_WheelRL.h>
 #include <Driver_WheelRR.h>
-
+#include <Control_Motor.h>
+#include <Control_Buzzer.h>
 
 
 /*****************/
@@ -53,7 +54,7 @@ static void AppTask500ms(void);
 /***********************************************************************/
 /*Variable*/ 
 /***********************************************************************/
-
+uint8 g_state;
 uint8 g_sub_state;
 uint32 g_rpm_ref;
 /***********************************************************************/
@@ -62,21 +63,22 @@ uint32 g_rpm_ref;
 
 static void AppTask1ms(void)
 {
-
+    set_all_wheel(g_state,g_sub_state,g_rpm_ref);
+    pi_control(1.0, 2.0, 0.001);
 }
 
 static void AppTask10ms(void)
 {
-//    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
+    g_state = get_state();
+    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
 {
-//    g_rpm_ref = get_rpm_reference();
-
-
+    g_rpm_ref = get_rpm_reference();
 }
 static void AppTask50ms(void)
 {
+    /*
     { // for test
     uint32 temp = get_potentiometer_value();
 
@@ -98,7 +100,7 @@ static void AppTask50ms(void)
             get_mid_adc_group2_raw()->UlSSense1_Raw,
             get_mid_adc_group2_raw()->UlSSense2_Raw);
     }
-
+*/
 }
 static void AppTask100ms(void)
 {
@@ -106,11 +108,10 @@ static void AppTask100ms(void)
 }
 static void AppTask250ms(void)
 {
-
+    set_buzzer_250ms(g_state, g_sub_state);
 }
 static void AppTask500ms(void)
 {
-//    toggle_buzzer();
 }
 static void AppNoTask()
 {
