@@ -37,52 +37,8 @@
 /***********************************************************************/
 /*Variable*/
 /***********************************************************************/
-static uint32 s_state=0;
 
 /***********************************************************************/
 /*Function*/
 /***********************************************************************/
-uint32 get_state(void)
-{
 
-    JoystickValue move;
-    JoystickValue rotate;
-    move = get_joystick_move_value();
-    rotate = get_joystick_rotate_value();
-
-    if(move.x <= 1570 && move.y <= 1570){
-        s_state = 2;
-    }
-    else if(move.x >=3350 && move.y <= 1570){
-        s_state = 0;
-    }
-    else if(move.x <=1570 && move.y > 3350){
-        s_state = 8;
-    }
-    else if(move.x >= 3350 && move.y > 3350){
-        s_state = 6;
-    }
-    else if(move.x < 3350 && move.y < 1570){
-        s_state = 1;
-    }
-    else if(move.x >= 3350 && move.y <= 3350){
-        s_state = 3;
-    }
-    else if(move.x < 3350 && move.y > 3350){
-        s_state = 7;
-    }
-    else if(move.x <= 1570 && move.y <= 3350){
-        s_state = 5;
-    }
-    else {
-        if(rotate.x>=3350 && rotate.y<3350 &&rotate.y>=1570){
-            s_state = 10;
-        }
-        else if(rotate.x<=1570 &&rotate.y<3350 &&rotate.y>=1570){
-            s_state = 9;
-        }
-        else s_state =4;
-    }
-
-    return s_state;
-}

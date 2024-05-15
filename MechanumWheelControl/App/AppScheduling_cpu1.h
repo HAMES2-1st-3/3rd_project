@@ -1,21 +1,11 @@
-/*
- * Decision_RPM.h
- *
- *  Created on: 2024. 5. 10.
- *      Author: jaeeun
- *  필요 함수 및 기능
- *    float32 FUNC();
- *     - 가변저항의 값(0~1023)을 읽어 RPM 단위로 변환하여 return함
- *     - RPM 의 범위는 실험을 통해 설정하기
- *     -> Driver_Potentiometer.h 사용
- */
-#ifndef DECISION_DECISION_RPM_H_
-#define DECISION_DECISION_RPM_H_
+#ifndef APPSCHEDULING_CPU1
+#define APPSCHEDULING_CPU1
 
 /***********************************************************************/
 /*Include*/ 
 /***********************************************************************/
-#include <Driver_Potentiometer.h>
+#include "Ifx_Types.h"
+#include <Driver_Bluetooth.h>
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
@@ -31,6 +21,7 @@
 /***********************************************************************/
 /*Global Function Prototype*/ 
 /***********************************************************************/
-void get_rpm_max(void);
+void AppScheduling_cpu1(void);
+void init_appscheduling_cpu1(void);
 
-#endif /* DECISION_DECISION_RPM_H_ */
+#endif /* DRIVER_STM */

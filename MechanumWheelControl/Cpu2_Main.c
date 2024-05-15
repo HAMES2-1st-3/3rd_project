@@ -1,5 +1,5 @@
 /**********************************************************************************************************************
- * \file Cpu0_Main.c
+ * \file Cpu2_Main.c
  * \copyright Copyright (C) Infineon Technologies AG 2019
  * 
  * Use of this file is subject to the terms of use agreed between (i) you or the company in which ordinary course of 
@@ -28,60 +28,24 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
-#include <Driver_Joystick.h>
-#include <Driver_Potentiometer.h>
-#include <Driver_ToF.h>
-#include <Driver_USB.h>
-#include <Driver_Bluetooth.h>
+extern IfxCpu_syncEvent g_cpuSyncEvent;
 
-#include <Driver_Buzzer.h>
-#include <Driver_WheelFL.h>
-#include <Driver_WheelFR.h>
-#include <Driver_WheelRL.h>
-#include <Driver_WheelRR.h>
-
-#include <AppScheduling.h>
-
-
-IfxCpu_syncEvent g_cpuSyncEvent = 0;
-
-
-
-void core0_main(void)
+int core2_main(void)
 {
     IfxCpu_enableInterrupts();
     
-    /* !!WATCHDOG0 AND SAFETY WATCHDOG ARE DISABLED HERE!!
-     * Enable the watchdogs and service them periodically if it is required
+    /* !!WATCHDOG2 IS DISABLED HERE!!
+     * Enable the watchdog and service it periodically if it is required
      */
     IfxScuWdt_disableCpuWatchdog(IfxScuWdt_getCpuWatchdogPassword());
-    IfxScuWdt_disableSafetyWatchdog(IfxScuWdt_getSafetyWatchdogPassword());
     
     /* Wait for CPU sync event */
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
-
-    init_appscheduling(); // for AppScheduling
-
-    /* Initialize Device Driver */
-    init_tof();
-    init_potentiometer();
-    init_buzzer();
-    init_joystick();
-    init_usb();
-
-//    init_bluetooth();
-
-    init_wheelFL();
-    init_wheelFR();
-    init_wheelRL();
-    init_wheelRR();
-
+    
     while(1)
     {
-        AppScheduling();
-//        JoystickValueForBT values = receive_data();
-
 
     }
+    return (1);
 }

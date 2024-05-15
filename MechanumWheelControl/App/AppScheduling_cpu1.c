@@ -2,8 +2,7 @@
 /*Include*/ 
 /***********************************************************************/
 #include <AppMode.h>
-#include <AppScheduling.h>
-
+#include <AppScheduling_cpu1.h>
 
 #include "IfxStm.h"
 #include "IfxCpu_Irq.h"
@@ -63,7 +62,7 @@ struct
     IfxStm_CompareConfig stmConfig;         /**< \brief Stm Configuration structure */
     volatile uint8       LedBlink;          /**< \brief LED state variable */
     volatile uint32      counter;           /**< \brief interrupt counter */
-} g_stm; /**< \brief Stm global data */
+} g_stm_1; /**< \brief Stm global data */
 
 struct
 {
@@ -74,17 +73,15 @@ struct
     uint8 scheduling_flag_100ms;
     uint8 scheduling_flag_250ms;
     uint8 scheduling_flag_500ms;
-}g_scheduling_info;
-
-uint32 g_counter_1ms = 0u;
+}g_scheduling_info_1;
 
 extern JoystickValueForBT g_joystick_values;
+
+uint32 g_counter_1_1ms = 0u;
 
 /***********************************************************************/
 /*User Variable*/
 /***********************************************************************/
-uint8 g_sub_state;
-uint32 g_rpm_ref;
 
 /***********************************************************************/
 /*Function*/ 
@@ -92,26 +89,27 @@ uint32 g_rpm_ref;
 
 static void AppTask1ms(void)
 {
-
+    g_joystick_values = receive_data();
 }
 
 static void AppTask10ms(void)
 {
-
+//    _usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
+//                g_joystick_values.move_x,
+//                g_joystick_values.move_y,
+//                g_joystick_values.rotate_x,
+//                g_joystick_values.rotate_y);
 }
 static void AppTask20ms(void)
 {
+
 
 }
 static void AppTask50ms(void)
 {
 //    JoystickValueForBT values = receive_data();
 //    _usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n", values.move_x, values.move_y, values.rotate_x, values.rotate_y);
-    _usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
-                    g_joystick_values.move_x,
-                    g_joystick_values.move_y,
-                    g_joystick_values.rotate_x,
-                    g_joystick_values.rotate_y);
+
 }
 static void AppTask100ms(void)
 {
@@ -130,42 +128,42 @@ static void AppNoTask()
 
 }
 
-void AppScheduling(void)
+void AppScheduling_cpu1(void)
 {
     AppNoTask();
-    if(g_scheduling_info.scheduling_flag_1ms == 1u)
+    if(g_scheduling_info_1.scheduling_flag_1ms == 1u)
     {
-        g_scheduling_info.scheduling_flag_1ms = 0u;
+        g_scheduling_info_1.scheduling_flag_1ms = 0u;
         AppTask1ms();
         
-        if(g_scheduling_info.scheduling_flag_10ms == 1u)
+        if(g_scheduling_info_1.scheduling_flag_10ms == 1u)
         {
-            g_scheduling_info.scheduling_flag_10ms = 0u;
+            g_scheduling_info_1.scheduling_flag_10ms = 0u;
             AppTask10ms();
         }
-        if(g_scheduling_info.scheduling_flag_20ms == 1u)
+        if(g_scheduling_info_1.scheduling_flag_20ms == 1u)
         {
-            g_scheduling_info.scheduling_flag_20ms = 0u;
+            g_scheduling_info_1.scheduling_flag_20ms = 0u;
             AppTask20ms();
         }
-        if(g_scheduling_info.scheduling_flag_50ms == 1u)
+        if(g_scheduling_info_1.scheduling_flag_50ms == 1u)
         {
-            g_scheduling_info.scheduling_flag_50ms = 0u;
+            g_scheduling_info_1.scheduling_flag_50ms = 0u;
             AppTask50ms();
         }
-        if(g_scheduling_info.scheduling_flag_100ms == 1u)
+        if(g_scheduling_info_1.scheduling_flag_100ms == 1u)
         {
-            g_scheduling_info.scheduling_flag_100ms = 0u;
+            g_scheduling_info_1.scheduling_flag_100ms = 0u;
             AppTask100ms();
         }
-        if(g_scheduling_info.scheduling_flag_250ms == 1u)
+        if(g_scheduling_info_1.scheduling_flag_250ms == 1u)
         {
-            g_scheduling_info.scheduling_flag_250ms = 0u;
+            g_scheduling_info_1.scheduling_flag_250ms = 0u;
             AppTask250ms();
         }
-        if(g_scheduling_info.scheduling_flag_500ms == 1u)
+        if(g_scheduling_info_1.scheduling_flag_500ms == 1u)
         {
-            g_scheduling_info.scheduling_flag_500ms = 0u;
+            g_scheduling_info_1.scheduling_flag_500ms = 0u;
             AppTask500ms();
         }
     }
@@ -173,64 +171,64 @@ void AppScheduling(void)
 
 
 
-IFX_INTERRUPT(stm0_comp_ir0_isr, 0, ISR_PRIORITY_STMSR0);
-void stm0_comp_ir0_isr(void)
+IFX_INTERRUPT(stm1_comp_ir0_isr, 1, ISR_PRIORITY_STMSR1);
+void stm1_comp_ir0_isr(void)
 {
     IfxCpu_enableInterrupts();
 
-    IfxStm_clearCompareFlag(g_stm.stmSfr, g_stm.stmConfig.comparator);
-    IfxStm_increaseCompare(g_stm.stmSfr, g_stm.stmConfig.comparator, 100000u);
+    IfxStm_clearCompareFlag(g_stm_1.stmSfr, g_stm_1.stmConfig.comparator);
+    IfxStm_increaseCompare(g_stm_1.stmSfr, g_stm_1.stmConfig.comparator, 100000u);
 
-    g_counter_1ms++;
+    g_counter_1_1ms++;
 
 
-    if((g_counter_1ms % 1) == 0u)
+    if((g_counter_1_1ms % 1) == 0u)
     {
-        g_scheduling_info.scheduling_flag_1ms = 1u;
+        g_scheduling_info_1.scheduling_flag_1ms = 1u;
     }
 
-    if((g_counter_1ms % 10) == 0u)
+    if((g_counter_1_1ms % 10) == 0u)
     {
-        g_scheduling_info.scheduling_flag_10ms = 1u;
+        g_scheduling_info_1.scheduling_flag_10ms = 1u;
     }
-    if((g_counter_1ms % 20) == 0u)
+    if((g_counter_1_1ms % 20) == 0u)
     {
-        g_scheduling_info.scheduling_flag_20ms = 1u;
+        g_scheduling_info_1.scheduling_flag_20ms = 1u;
     }
-    if(g_counter_1ms % 50 == 0u)
+    if(g_counter_1_1ms % 50 == 0u)
     {
-        g_scheduling_info.scheduling_flag_50ms = 1u;
+        g_scheduling_info_1.scheduling_flag_50ms = 1u;
     }
-    if((g_counter_1ms % 100) == 0u)
+    if((g_counter_1_1ms % 100) == 0u)
     {
-        g_scheduling_info.scheduling_flag_100ms = 1u;
+        g_scheduling_info_1.scheduling_flag_100ms = 1u;
     }
-    if((g_counter_1ms % 250) == 0u)
+    if((g_counter_1_1ms % 250) == 0u)
     {
-        g_scheduling_info.scheduling_flag_250ms = 1u;
+        g_scheduling_info_1.scheduling_flag_250ms = 1u;
     }
-    if((g_counter_1ms % 500) == 0u)
+    if((g_counter_1_1ms % 500) == 0u)
     {
-        g_scheduling_info.scheduling_flag_500ms = 1u;
+        g_scheduling_info_1.scheduling_flag_500ms = 1u;
     }
 }
 
 
-void init_appscheduling(void) /* use STM0 */
+void init_appscheduling_cpu1(void) /* use STM0 */
 {
     /* disable interrupts */
     boolean interruptState = IfxCpu_disableInterrupts();
 
-    IfxStm_enableOcdsSuspend(&MODULE_STM0);
+    IfxStm_enableOcdsSuspend(&MODULE_STM1);
 
-    g_stm.stmSfr = &MODULE_STM0;
-    IfxStm_initCompareConfig(&g_stm.stmConfig);
+    g_stm_1.stmSfr = &MODULE_STM1;
+    IfxStm_initCompareConfig(&g_stm_1.stmConfig);
 
-    g_stm.stmConfig.triggerPriority = ISR_PRIORITY_STMSR0;
-    g_stm.stmConfig.typeOfService   = IfxSrc_Tos_cpu0;
-    g_stm.stmConfig.ticks           = 100000u;
+    g_stm_1.stmConfig.triggerPriority = ISR_PRIORITY_STMSR1;
+    g_stm_1.stmConfig.typeOfService   = IfxSrc_Tos_cpu1;
+    g_stm_1.stmConfig.ticks           = 100000u;
 
-    IfxStm_initCompare(g_stm.stmSfr, &g_stm.stmConfig);
+    IfxStm_initCompare(g_stm_1.stmSfr, &g_stm_1.stmConfig);
 
     /* enable interrupts again */
     IfxCpu_restoreInterrupts(interruptState);

@@ -31,8 +31,8 @@
 #define ISR_PRIORITY_SCUERU2        0x12    /* Priority for interrupt encoderRL chA */
 #define ISR_PRIORITY_SCUERU3        0x13    /* Priority for interrupt encoderRR chA */
 
-#define ISR_PRIORITY_STMSR0         0x64    /* Priority for interrupt STM */
-
+#define ISR_PRIORITY_STMSR0         0x64    /* Priority for interrupt STM0 */
+#define ISR_PRIORITY_STMSR1         0x65    /* Priority for interrupt STM1 */
 
 
 #endif /* DEVICEDRIVER_INTERRUPTPRIORITY_H_ */

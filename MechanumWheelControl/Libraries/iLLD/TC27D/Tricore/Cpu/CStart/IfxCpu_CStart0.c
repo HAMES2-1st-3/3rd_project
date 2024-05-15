@@ -60,10 +60,10 @@
 #   define IFX_CFG_CPU_CSTART_ENABLE_TRICORE0        (1) /**< Cpu0 enabled by default*/
 #endif
 #ifndef IFX_CFG_CPU_CSTART_ENABLE_TRICORE1
-#   define IFX_CFG_CPU_CSTART_ENABLE_TRICORE1        (0) /**< Cpu1 enabled by default*/
+#   define IFX_CFG_CPU_CSTART_ENABLE_TRICORE1        (1) /**< Cpu1 enabled by default*/
 #endif
 #ifndef IFX_CFG_CPU_CSTART_ENABLE_TRICORE2
-#   define IFX_CFG_CPU_CSTART_ENABLE_TRICORE2        (0) /**< Cpu2 enabled by default*/
+#   define IFX_CFG_CPU_CSTART_ENABLE_TRICORE2        (1) /**< Cpu2 enabled by default*/
 #endif
 
 /** \brief Configuration for cache enable.

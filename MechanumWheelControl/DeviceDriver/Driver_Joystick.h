@@ -17,10 +17,6 @@
 #include "IfxPort.h"
 #include "IfxPort_PinMap.h"
 
-#define get_mid_adc_group2_raw() (&g_adc2_raw)
-#define get_mid_adc_group0_raw() (&g_adc0_raw)
-
-
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/
@@ -50,19 +46,11 @@ typedef enum{
 }ADC_GROUP2;
 
 
-typedef struct{ //���� ����
-        uint32 UlSSense1_Raw;
-        uint32 UlSSense2_Raw;
-        uint32 UlSSense3_Raw;
-}SensorAdcRaw;
-
 typedef struct{ //센싱 변수
         uint32 x;
         uint32 y;
 }JoystickValue;
 
-extern SensorAdcRaw g_adc0_raw; //���� ���� ����
-extern SensorAdcRaw g_adc2_raw; //���� ���� ����
 
 /***********************************************************************/
 /*Define*/

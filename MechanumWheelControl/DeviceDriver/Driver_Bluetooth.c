@@ -53,6 +53,7 @@ static uint8 s_asclin2_tx_buf[ASC2_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 static uint8 s_asclin2_rx_buf[ASC2_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 
 JoystickValueForBT g_joystick;
+JoystickValueForBT g_joystick_values;
 /***********************************************************************/
 
 /*Function*/
@@ -71,7 +72,7 @@ void init_bluetooth(void) {
     asc_conf.interrupt.txPriority = ISR_PRIORITY_ASCLIN2_TX;
     asc_conf.interrupt.rxPriority = ISR_PRIORITY_ASCLIN2_RX;
     asc_conf.interrupt.erPriority = ISR_PRIORITY_ASCLIN2_ER;
-    asc_conf.interrupt.typeOfService = IfxSrc_Tos_cpu0;
+    asc_conf.interrupt.typeOfService = IfxSrc_Tos_cpu1;
 
     const IfxAsclin_Asc_Pins pins = {
         .cts = NULL_PTR,
@@ -98,7 +99,7 @@ void init_bluetooth(void) {
 void make_bluetooth_msg(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
     char message[USB_UART_MAX_PRINT_SIZE + 1];
 
-    snprintf(message, sizeof(message), "%u %u %u %u", x_mv, y_mv, x_rt, y_rt);
+    snprintf(message, sizeof(message), "%lu %lu %lu %lu", x_mv, y_mv, x_rt, y_rt);
 
     send_data(message);
 }
@@ -145,7 +146,7 @@ JoystickValueForBT receive_data(void) {
 
     // Parse the received string into the JoystickValue structure
     JoystickValueForBT joystick;
-    if (sscanf(buffer, "%u %u %u %u", &joystick.move_x, &joystick.move_y, &joystick.rotate_x, &joystick.rotate_y) == 4) {
+    if (sscanf(buffer, "%lu %lu %lu %lu", &joystick.move_x, &joystick.move_y, &joystick.rotate_x, &joystick.rotate_y) == 4) {
         g_joystick = joystick; // Update the global joystick value
     }
 
@@ -189,17 +190,17 @@ void init_bluetooth_slave(void) {
     */
 }
 
-IFX_INTERRUPT(asclin2_tx_ISR_bluetooth, 0, ISR_PRIORITY_ASCLIN2_TX);
+IFX_INTERRUPT(asclin2_tx_ISR_bluetooth, 1, ISR_PRIORITY_ASCLIN2_TX);
 void asclin2_tx_ISR_bluetooth(void) {
     IfxAsclin_Asc_isrTransmit(&s_asclin2);
 }
 
-IFX_INTERRUPT(asclin2_rx_ISR_bluetooth, 0, ISR_PRIORITY_ASCLIN2_RX);
+IFX_INTERRUPT(asclin2_rx_ISR_bluetooth, 1, ISR_PRIORITY_ASCLIN2_RX);
 void asclin2_rx_ISR_bluetooth(void) {
     IfxAsclin_Asc_isrReceive(&s_asclin2);
 }
 
-IFX_INTERRUPT(asclin2_err_ISR_bluetooth, 0, ISR_PRIORITY_ASCLIN2_ER);
+IFX_INTERRUPT(asclin2_err_ISR_bluetooth, 1, ISR_PRIORITY_ASCLIN2_ER);
 void asclin2_err_ISR_bluetooth(void) {
     ;
 }
