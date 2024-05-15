@@ -28,8 +28,6 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
-#include <Driver_STM.h>
-
 #include <Driver_Joystick.h>
 #include <Driver_Potentiometer.h>
 #include <Driver_ToF.h>
@@ -41,8 +39,9 @@
 #include <Driver_WheelRL.h>
 #include <Driver_WheelRR.h>
 
-
 #include <AppScheduling.h>
+
+
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
 void core0_main(void)
@@ -60,7 +59,7 @@ void core0_main(void)
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
 
 
-    init_stm(); // for AppScheduling
+    init_appscheduling(); // for AppScheduling
 
     /* Initialize Device Driver */
     init_tof();
@@ -73,7 +72,6 @@ void core0_main(void)
     init_wheelFR();
     init_wheelRL();
     init_wheelRR();
-
 
 
     while(1)

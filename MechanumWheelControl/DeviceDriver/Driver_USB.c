@@ -12,13 +12,14 @@
 /*Include*/
 /***********************************************************************/
 #include <Driver_USB.h>
-#include <Interrupt_Priority.h>
+#include <InterruptPriority.h>
+
+#include <PortPinMapping.h>
 
 #include "_Utilities/Ifx_Assert.h"
 
 #include "IfxAsclin_Asc.h"
 #include "IfxPort.h"
-
 
 #include <string.h>
 #include <stdio.h>
@@ -31,6 +32,8 @@
 #define ASC3_TX_BUFFER_SIZE          256                                     /* Define the TX buffer size in byte    */
 #define ASC3_RX_BUFFER_SIZE          256                                     /* Define the RX buffer size in byte    */
 #define ASC3_BAUDRATE                115200                                  /* Define the UART baud rate            */
+
+
 
 /***********************************************************************/
 /*Typedef*/
@@ -52,7 +55,7 @@ static uint8 s_asclin3_rx_buf[ASC3_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 /***********************************************************************/
 
 
-void usb_printf(pchar format,...)
+void _usb_printf(pchar format,...)
 {
     char      message[USB_UART_MAX_PRINT_SIZE + 1];
     Ifx_SizeT count;
@@ -105,11 +108,11 @@ void init_usb() {
     const IfxAsclin_Asc_Pins pins = {
           .cts        = NULL_PTR,                         /* CTS pin not used                                     */
           .ctsMode    = IfxPort_InputMode_pullUp,
-          .rx         = &IfxAsclin3_RXD_P32_2_IN ,        /* Select the pin for RX connected to the USB port      */
+          .rx         = &_M_USB_RX_IN ,        /* Select the pin for RX connected to the USB port      */
           .rxMode     = IfxPort_InputMode_pullUp,         /* RX pin                                               */
           .rts        = NULL_PTR,                         /* RTS pin not used                                     */
           .rtsMode    = IfxPort_OutputMode_pushPull,
-          .tx         = &IfxAsclin3_TX_P15_7_OUT,         /* Select the pin for TX connected to the USB port      */
+          .tx         = &_M_USB_TX_OUT,         /* Select the pin for TX connected to the USB port      */
           .txMode     = IfxPort_OutputMode_pushPull,      /* TX pin                                               */
           .pinDriver  = IfxPort_PadDriver_cmosAutomotiveSpeed1
     };
@@ -132,7 +135,7 @@ IFX_INTERRUPT(asclin3_tx_ISR, 0, ISR_PRIORITY_ASCLIN3_TX);
 void asclin3_tx_ISR(void)
 {
     IfxAsclin_Asc_isrTransmit(&s_asclin3);
-    // ¿Ã∞‘ æ¯¿∏∏È √π πÆ¿⁄∏∏ ∫∏≥ª¡ˆ∞Ì ±◊ ¿Ã»ƒø°¥¬ ¿¸º€¿Ã æ»µ .
+    // Ïù¥Í≤å ÏóÜÏúºÎ©¥ Ï≤´ Î¨∏ÏûêÎßå Î≥¥ÎÇ¥ÏßÄÍ≥† Í∑∏ Ïù¥ÌõÑÏóêÎäî Ï†ÑÏÜ°Ïù¥ ÏïàÎê®.
 }
 
 IFX_INTERRUPT(asclin3_rx_ISR, 0, ISR_PRIORITY_ASCLIN3_RX);

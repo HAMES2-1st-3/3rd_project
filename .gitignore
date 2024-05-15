@@ -7,4 +7,5 @@
 *.mdf
 *.mk
 *.opt
-./.settings/language.settings.xml
+MechanumWheelControl/.settings/language.settings.xml
+MechanumWheelControl/TriCore Debug (TASKING)/
