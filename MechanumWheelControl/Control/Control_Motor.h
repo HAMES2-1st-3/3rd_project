@@ -50,6 +50,12 @@ typedef struct {
     float32 rl_I_err_old;
 } control_errors_old;
 
+typedef struct{
+    float32 theta_hat;
+    float32 omega_hat;
+    float32 current_hat;
+    float32 theta_tilde;
+}estimate_state_var;
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -66,5 +72,5 @@ extern wheel_rpms control_output;
 void set_all_wheel(uint8 state, uint8 sub_state, float32 goal_rpm);
 void opened_loop_control(void);
 void closed_loop_control(float32 kp, float32 ki, float32 Ts);
-void observer_theta_fl(void);
+estimate_state_var observer_theta_fl(float32 Ts);
 #endif /* CONTROL_CONTROL_MOTOR_H_ */

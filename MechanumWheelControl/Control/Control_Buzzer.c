@@ -62,22 +62,21 @@ void set_buzzer_250ms(uint8 state,uint8 substate){
     if(state!=4){
         switch(substate){
             case 0://normal
-                stop_buzzer();
+                set_buzzer_off();
                 break;
             case 1://slow
-                toggle_buzzer();
+                set_buzzer_toggle();
                 break;
             case 2://stop
-                start_buzzer();
+                set_buzzer_on();
                 break;
             default:  //?
-                stop_buzzer();
+                set_buzzer_off();
                 break;
         }
     }
     else{
-        stop_buzzer();
+        set_buzzer_off();
     }
 }
-
 

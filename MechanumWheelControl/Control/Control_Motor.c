@@ -20,6 +20,7 @@
 /*Define*/ 
 /***********************************************************************/
 #define RPM_MAX 5300.0
+#define e 2.718281
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
@@ -30,7 +31,7 @@
 static float32 LPF(float32 Y_fill_d,float32 u,float32 cf,float32 T);
 static float32 get_derivative(sint32 ticks,float32 Ts);
 static float32 saturation(float32 bottom, float32 high, float32 target);
-
+static float32 get_vin(float32 dutycycle);
 /***********************************************************************/
 
 /*Variable*/
@@ -43,20 +44,58 @@ wheel_rpms g_ref_rpm;//value of reference RPM for each wheels
 wheel_rpms g_cur_rpm;//value of current RPM for each wheels
 wheel_rpms control_output;//value of duty cycle for each wheels
 
+//observer
+float32 L1=21.8017;
+float32 L2= 41.5731;
+float32 L3=-0.5167;
+
+float32 J=2.09*e-5;
+float32 Kb=0.042;
+float32 Kt=0.042;
+float32 R=8.4;
+float32 L=1.16;
+float32 B=0.00002;
+estimate_state_var g_estimate_state_var;
 /***********************************************************************/
 
 /*Function*/ 
 /***********************************************************************/
-//Ȥ�� �� ������ ����
-void observer_theta_fl(void){
-    static float32 theta_hat=0; //���� ������ �ʱ� 0
-    static float32 omega_hat=0;
-    static float32 current_hat=0;
-    static float32 theta_tilde=0;
+/*Function*/
+//func call flow : set_all_wheel() ->closed_loop_control()->observer_theta_fl()
+//==> check <theta_tilde value=0>
+/***********************************************************************/
+//make observers
 
-    //theta_tilde=(theta:���ڴ� ������)-theta_hat;
+//need integral -> Ts=0.001
+estimate_state_var observer_theta_fl(float32 Ts){ //frontLeft motor theta observer(goal : follow theta_hat)
+    static float32 theta_hat=0; //init value : 0 as estimate value , integral value
+    static float32 omega_hat=0; //init value : 0 as estimate value
+    static float32 current_hat=0; //init value : 0 as estimate value
+    static float32 theta_tilde=0; //Estimate error (goal: theta_tilde=0)
+
+    //integral
+    static float32 theta_hat_old=0;
+    static float32 omega_hat_old=0;
+    static float32 current_hat_old=0;
+
+    //theta_tilde=(theta:encoder's ticks)-theta_hat;
     theta_tilde=(float32)(get_wheelFL_tick())-theta_hat;
 
+    theta_hat=theta_hat_old+ (omega_hat+(L1)*theta_tilde)*Ts;
+    omega_hat=omega_hat_old+(current_hat*(Kt/J)-omega_hat*(B/J)+theta_tilde*(L2))*Ts;
+    //explicit input : get_vin(control_output.fl)
+    current_hat=current_hat_old+(-current_hat*(R/L)-omega_hat*(Kb/L)+(1/L)*get_vin(control_output.fl)+(L3)*theta_tilde)*Ts;
+
+    theta_hat_old=theta_hat;
+    omega_hat_old=omega_hat;
+    current_hat_old=current_hat;
+
+    g_estimate_state_var.theta_hat=theta_hat;
+    g_estimate_state_var.omega_hat=omega_hat;
+    g_estimate_state_var.current_hat=current_hat;
+    g_estimate_state_var.theta_tilde=theta_tilde;
+
+    return g_estimate_state_var; //goal: theta_tilde->0 (error->0)
 }
 void opened_loop_control(void)
 {
@@ -69,11 +108,11 @@ void closed_loop_control(float32 kp, float32 ki, float32 Ts)
 {
     //get current rpm from encoder ticks
     //����ȯ �ʿ�?
-    g_cur_rpm.fl=get_derivative(get_wheelFL_tick(),Ts)*(60/22.0); // multiply rpm scailing 60/22.0
+    //g_cur_rpm.fl=get_derivative(get_wheelFL_tick(),Ts)*(60/22.0); // multiply rpm scailing 60/22.0
 
-   // g_cur_rpm.fr=get_derivative(get_wheelFR_tick(),Ts)*(60/22.0); // multiply rpm scailing
-   // g_cur_rpm.rl=get_derivative(get_wheelRL_tick(),Ts)*(60/22.0); // multiply rpm scailing
-   // g_cur_rpm.rr=get_derivative(get_wheelRR_tick(),Ts)*(60/22.0); // multiply rpm scailing
+    g_cur_rpm.fr=get_derivative(get_wheelFR_tick(),Ts)*(60/22.0); // multiply rpm scailing
+    //g_cur_rpm.rl=get_derivative(get_wheelRL_tick(),Ts)*(60/22.0); // multiply rpm scailing
+    //g_cur_rpm.rr=get_derivative(get_wheelRR_tick(),Ts)*(60/22.0); // multiply rpm scailing
 
     //watch only fl
 
@@ -133,8 +172,8 @@ void closed_loop_control(float32 kp, float32 ki, float32 Ts)
     control_output.rl=saturation(-100.0, 100.0, control_output.rl);
     control_output.rr=saturation(-100.0, 100.0, control_output.rr);
 
-    set_wheelFL_dutycycle(control_output.fl);
-    //set_wheelFR_dutycycle(control_output.fr);
+    //set_wheelFL_dutycycle(control_output.fl);
+    set_wheelFR_dutycycle(control_output.fr);
     //set_wheelRL_dutycycle(control_output.rl);
     //set_wheelRR_dutycycle(control_output.rr);
     return;
@@ -242,4 +281,9 @@ static float32 saturation(float32 bottom, float32 high, float32 target){
 }
 static float32 LPF(float32 Y_fill_d,float32 u,float32 cf,float32 T){ // cf=cutoff
     return (1-T*cf)*Y_fill_d+T*cf*u;
+}
+static float32 get_vin(float32 dutycycle){ // input example: control_output.fl
+    float32 vin;
+    vin=dutycycle/100.0*12; //absolute -> scailing-> voltage(0~12V)
+    return vin;
 }

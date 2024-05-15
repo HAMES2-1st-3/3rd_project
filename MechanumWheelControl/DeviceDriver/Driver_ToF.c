@@ -11,6 +11,8 @@
 /***********************************************************************/
 #include <Driver_ToF.h>
 
+#include <InterruptPriority.h>
+
 #include <string.h>
 /***********************************************************************/
 /*Define*/
@@ -158,4 +160,3 @@ sint32 get_tof_distance(void)
     }
     return tof_distance;
 }
-

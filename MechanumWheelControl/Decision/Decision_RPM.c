@@ -16,7 +16,7 @@
 #include <Decision_RPM.h>
 #include <Driver_USB.h>
 #include <Driver_Joystick.h>
-#include "stdlib.h"
+#include "math.h"
 /***********************************************************************/
 /*Define*/ 
 /***********************************************************************/
@@ -59,11 +59,11 @@ float32 get_rpm_reference(uint8 state)
     //usb_printf("O: rotate_x_val:%u,rotate_y_val:%u\n",rotate.x,rotate.y);
     if(state ==2 ||state ==1 || state ==0) //state 0,1,2
     {
-        ref_rpm = abs((float)move.y - 1570)/(1570) * g_rpm_max;
+        ref_rpm = fabs((float)move.y - 1570)/(1570) * g_rpm_max;
     }
     else if(state ==3) //state 3
     {
-        ref_rpm = abs((float)move.x-3350)/(4095-3350)*g_rpm_max;
+        ref_rpm = fabs((float)move.x-3350)/(4095-3350)*g_rpm_max;
     }
     else if(state ==4) //state 4
     {
@@ -71,19 +71,19 @@ float32 get_rpm_reference(uint8 state)
     }
     else if(state ==5) //state 5
     {
-        ref_rpm = abs((float)move.x-1570)/(1570)*g_rpm_max;
+        ref_rpm = fabs((float)move.x-1570)/(1570)*g_rpm_max;
     }
     else if(state ==8 ||state ==7 ||state ==6) //state 6 7 8
     {
-        ref_rpm = abs((float)move.y-3350)/(4095-3350)*g_rpm_max;
+        ref_rpm = fabs((float)move.y-3350)/(4095-3350)*g_rpm_max;
     }
     else if(state ==9) //state 9
     {
-        ref_rpm = abs((float)rotate.x-1570)/(1570)*g_rpm_max;
+        ref_rpm = fabs((float)rotate.x-1570)/(1570)*g_rpm_max;
     }
     else //state 10
     {
-        ref_rpm = abs((float)rotate.x-3350)/(4095-3350)*g_rpm_max;
+        ref_rpm = fabs((float)rotate.x-3350)/(4095-3350)*g_rpm_max;
     }
 
     return ref_rpm;

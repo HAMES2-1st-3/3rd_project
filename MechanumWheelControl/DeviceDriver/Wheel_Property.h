@@ -1,5 +1,5 @@
 /**********************************************************************************************************************
- * \file Wheel_Property.h
+ * \file System_Property.h
  * \copyright Copyright (C) Infineon Technologies AG 2019
  * 
  * Use of this file is subject to the terms of use agreed between (i) you or the company in which ordinary course of 

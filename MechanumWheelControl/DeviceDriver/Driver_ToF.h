@@ -20,7 +20,7 @@
 #include "IfxAsclin_bf.h"
 #include "IfxAsclin_Asc.h"
 #include "IfxSrc_reg.h"
-#include <Interrupt_Priority.h>
+
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/
@@ -38,9 +38,10 @@
 /***********************************************************************/
 /*Global Function Prototype*/
 /***********************************************************************/
-void asclin1_tx_ISR(void);
-void asclin1_rx_ISR(void);
-void asclin1_err_ISR(void);
+
+
 void init_tof(void);
-extern sint32 get_tof_distance(void);
+sint32 get_tof_distance(void);
+
+
 #endif /* DEVICEDRIVER_DRIVER_TOF_H_ */

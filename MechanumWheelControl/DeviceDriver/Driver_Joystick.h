@@ -16,11 +16,6 @@
 #include "IfxVadc_Adc.h"
 #include "IfxPort.h"
 #include "IfxPort_PinMap.h"
-
-#define get_mid_adc_group2_raw() (&g_adc2_raw)
-#define get_mid_adc_group0_raw() (&g_adc0_raw)
-
-
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/
@@ -50,14 +45,18 @@ typedef enum{
 }ADC_GROUP2;
 
 
-typedef struct{ //¼¾½Ì º¯¼ö
+typedef struct{ //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         uint32 UlSSense1_Raw;
         uint32 UlSSense2_Raw;
         uint32 UlSSense3_Raw;
 }SensorAdcRaw;
 
-extern SensorAdcRaw g_adc0_raw; //Àü·Â ¼¾½Ì º¯¼ö
-extern SensorAdcRaw g_adc2_raw; //Àü·Â ¼¾½Ì º¯¼ö
+typedef struct{ //ì„¼ì‹± ë³€ìˆ˜
+        uint32 x;
+        uint32 y;
+        boolean sw;
+}JoystickValue;
+
 
 /***********************************************************************/
 /*Define*/
@@ -66,15 +65,13 @@ extern SensorAdcRaw g_adc2_raw; //Àü·Â ¼¾½Ì º¯¼ö
 /***********************************************************************/
 /*External Variable*/
 /***********************************************************************/
-//IFX_EXTERN App_VadcAutoScan g_VadcAutoScan;
-//extern volatile uint32_t adcDataResult[5];
 
 /***********************************************************************/
 /*Global Function Prototype*/
 /***********************************************************************/
 
 void init_joystick(void);
-void get_adc_group0_raw(void);
-void get_adc_group2_raw(void);
+JoystickValue get_joystick_move_value(void);
+JoystickValue get_joystick_rotate_value(void);
 
 #endif /* DRIVER_JOYSTICK */

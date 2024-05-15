@@ -33,8 +33,6 @@
 /*********************************************************************************************************************/
 #include "Ifx_Types.h"
 
-#include <Wheel_Property.h>
-
 
 /*********************************************************************************************************************/
 /*------------------------------------------------------Macros-------------------------------------------------------*/
@@ -64,18 +62,9 @@ void set_wheelFR_dutycycle(float32 dutycycle); // dutycycle : 100f ~ -100f
 // 100% ~ -100%
 float32 get_wheelFR_dutycycle(void);
 
-// 0% ~ 100%
-float32 get_wheelFR_speed(void);
-
-// 1 : forward, 0 : backward
-boolean get_wheelFR_direction(void);
-
 sint32 get_wheelFR_tick(void);
 
 
-
-void init_motorFR(void);
-void init_encoderFR(void);
 
 
 #endif /* DEVICEDRIVER_DRIVER_WHEELFR_H_ */

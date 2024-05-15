@@ -4,17 +4,19 @@
 #include <AppMode.h>
 #include <AppScheduling.h>
 
-#include <Driver_Stm.h>
+#include "IfxStm.h"
+#include "IfxCpu_Irq.h"
 
+/********** control, Decision **********/
 #include <Control_Buzzer.h>
 #include <Control_Motor.h>
 
 #include <Decision_RPM.h>
 #include <Decision_State.h>
 #include <Decision_Sub_State.h>
+/***************************************/
 
-/*****test******/
-
+/*******for test DD header files********/
 #include <Driver_Joystick.h>
 #include <Driver_Potentiometer.h>
 #include <Driver_ToF.h>
@@ -25,10 +27,8 @@
 #include <Driver_WheelFR.h>
 #include <Driver_WheelRL.h>
 #include <Driver_WheelRR.h>
-
-
-
-/*****************/
+#include <InterruptPriority.h>
+/***************************************/
 
 
 /***********************************************************************/
@@ -51,7 +51,7 @@ static void AppTask100ms(void);
 static void AppTask250ms(void);
 static void AppTask500ms(void);
 /***********************************************************************/
-/*Variable*/ 
+/*System Variable*/
 /***********************************************************************/
 
 
@@ -82,6 +82,8 @@ uint32 g_counter_1ms = 0u;
 uint8 g_state;
 uint8 g_sub_state;
 float32 g_rpm_ref;
+float32 theta_tilde;
+
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
@@ -89,14 +91,14 @@ float32 g_rpm_ref;
 static void AppTask1ms(void)
 {
     set_all_wheel(g_state, g_sub_state, g_rpm_ref);
-    opened_loop_control();
+    closed_loop_control(0.01,1.0, 0.001);
+   // theta_tilde=observer_theta_fl(0.001).theta_tilde;
 }
 
 static void AppTask10ms(void)
 {
     g_state = get_state();
-    g_sub_state = 0;
-//    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
+    g_sub_state = 0; // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
 {
@@ -106,7 +108,8 @@ static void AppTask20ms(void)
 }
 static void AppTask50ms(void)
 {
-    _usb_printf("rpm_ref:%lf, state: %u\n", g_ref_rpm.fl, g_state);
+    //_usb_printf("theta_tilde(theta-theta_hat)=%lf\n",theta_tilde);
+    _usb_printf("g_ref_rpm.fr:%lf, g_cur_rpm.fr:%lf\n",g_ref_rpm.fr,g_cur_rpm.fr);
 //    float32 poten = get_potentiometer_data(); // 100% ~ 0%
 //    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
 //    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
@@ -132,7 +135,7 @@ static void AppTask100ms(void)
 }
 static void AppTask250ms(void)
 {
-
+//    set_buzzer_toggle();
 }
 static void AppTask500ms(void)
 {
@@ -183,3 +186,71 @@ void AppScheduling(void)
         }
     }
 }
+
+
+
+IFX_INTERRUPT(stm0_comp_ir0_isr, 0, ISR_PRIORITY_STMSR0);
+void stm0_comp_ir0_isr(void)
+{
+    IfxCpu_enableInterrupts();
+
+    IfxStm_clearCompareFlag(g_stm.stmSfr, g_stm.stmConfig.comparator);
+    IfxStm_increaseCompare(g_stm.stmSfr, g_stm.stmConfig.comparator, 100000u);
+
+    g_counter_1ms++;
+
+
+    if((g_counter_1ms % 1) == 0u)
+    {
+        g_scheduling_info.scheduling_flag_1ms = 1u;
+    }
+
+    if((g_counter_1ms % 10) == 0u)
+    {
+        g_scheduling_info.scheduling_flag_10ms = 1u;
+    }
+    if((g_counter_1ms % 20) == 0u)
+    {
+        g_scheduling_info.scheduling_flag_20ms = 1u;
+    }
+    if(g_counter_1ms % 50 == 0u)
+    {
+        g_scheduling_info.scheduling_flag_50ms = 1u;
+    }
+    if((g_counter_1ms % 100) == 0u)
+    {
+        g_scheduling_info.scheduling_flag_100ms = 1u;
+    }
+    if((g_counter_1ms % 250) == 0u)
+    {
+        g_scheduling_info.scheduling_flag_250ms = 1u;
+    }
+    if((g_counter_1ms % 500) == 0u)
+    {
+        g_scheduling_info.scheduling_flag_500ms = 1u;
+    }
+}
+
+
+void init_appscheduling(void) /* use STM0 */
+{
+    /* disable interrupts */
+    boolean interruptState = IfxCpu_disableInterrupts();
+
+    IfxStm_enableOcdsSuspend(&MODULE_STM0);
+
+    g_stm.stmSfr = &MODULE_STM0;
+    IfxStm_initCompareConfig(&g_stm.stmConfig);
+
+    g_stm.stmConfig.triggerPriority = ISR_PRIORITY_STMSR0;
+    g_stm.stmConfig.typeOfService   = IfxSrc_Tos_cpu0;
+    g_stm.stmConfig.ticks           = 100000u;
+
+    IfxStm_initCompare(g_stm.stmSfr, &g_stm.stmConfig);
+
+    /* enable interrupts again */
+    IfxCpu_restoreInterrupts(interruptState);
+}
+
+
+
