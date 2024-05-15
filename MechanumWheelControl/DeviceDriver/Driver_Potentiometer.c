@@ -9,12 +9,16 @@
 /***********************************************************************/
 #include <Driver_Potentiometer.h>
 
+#include <PortPinMapping.h>
+
+#include "IfxVadc.h"
+#include "IfxVadc_Adc.h"
+
+
+
 /***********************************************************************/
 /*Define*/
 /***********************************************************************/
-
-#define ADC_CH_ID 1
-#define ADC_GR_ID IfxVadc_GroupId_3
 
 /***********************************************************************/
 /*Typedef*/
@@ -28,7 +32,7 @@
 /***********************************************************************/
 /*Variable*/
 /***********************************************************************/
-static IfxVadc_Adc_Channel   s_adc0Channel[8];
+static IfxVadc_Adc_Channel   s_adc3_channel[8];
 
 
 /***********************************************************************/
@@ -38,10 +42,12 @@ static IfxVadc_Adc_Channel   s_adc0Channel[8];
 
 void init_potentiometer(void)
 {
+
+    /**************************** ADC group init ******************************/
     // variable register : AD6
     // luminous intensity : AD5
 
-    uint32    chnIx = ADC_CH_ID;
+    uint32    chnIx = _M_POTENTIOMETER_ADC_CH_ID;
 
     /* VADC Configuration */
 
@@ -58,7 +64,7 @@ void init_potentiometer(void)
     IfxVadc_Adc_initGroupConfig(&adcGroupConfig, &vadc);
 
     /* with group 0 */
-    adcGroupConfig.groupId = ADC_GR_ID;
+    adcGroupConfig.groupId = _M_POTENTIOMETER_ADC_GP_ID;
     adcGroupConfig.master  = adcGroupConfig.groupId;
 
     /* enable scan source */
@@ -86,7 +92,7 @@ void init_potentiometer(void)
     s_adc0ChannelConfig[chnIx].resultRegister = (IfxVadc_ChannelResult)(chnIx);  /* use dedicated result register */
 
     /* initialize the channel */
-    IfxVadc_Adc_initChannel(&s_adc0Channel[chnIx], &s_adc0ChannelConfig[chnIx]);
+    IfxVadc_Adc_initChannel(&s_adc3_channel[chnIx], &s_adc0ChannelConfig[chnIx]);
 
     /* add to scan */
     unsigned channels = (1 << s_adc0ChannelConfig[chnIx].channelId);
@@ -100,19 +106,28 @@ void init_potentiometer(void)
 
 uint32 get_potentiometer_value(void)
 {
-    uint32 adc0DataResult[8];
-
-    uint32    chnIx = ADC_CH_ID;
     Ifx_VADC_RES conversionResult; /* wait for valid result */
 
     /* check results */
     do
     {
-        conversionResult = IfxVadc_Adc_getResult(&s_adc0Channel[chnIx]);
+        conversionResult = IfxVadc_Adc_getResult(&s_adc3_channel[_M_POTENTIOMETER_ADC_CH_ID]);
     } while (!conversionResult.B.VF);
 
-    adc0DataResult[chnIx] = conversionResult.B.RESULT;
-    return adc0DataResult[chnIx];
+    return (uint32)conversionResult.B.RESULT;
+}
+
+float32 get_potentiometer_data(void)
+{
+    Ifx_VADC_RES conversion_res; /* wait for valid result */
+
+    /* check results */
+    do
+    {
+        conversion_res = IfxVadc_Adc_getResult(&s_adc3_channel[_M_POTENTIOMETER_ADC_CH_ID]);
+    } while (!conversion_res.B.VF);
+
+    return ((float32)(conversion_res.B.RESULT) * 100 / POTENTIOMETER_MAX_VALUE);
 }
 
 

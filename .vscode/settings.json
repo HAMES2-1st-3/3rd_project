@@ -1,6 +1,10 @@
 {
         "files.associations": {
                 "driver_asclin3.h": "c",
-                "driver_usb.h": "c"
+                "driver_usb.h": "c",
+                "ifx_types.h": "c",
+                "portpinmapping.h": "c",
+                "interruptpriority.h": "c",
+                "driver_tof.h": "c"
         }
 }

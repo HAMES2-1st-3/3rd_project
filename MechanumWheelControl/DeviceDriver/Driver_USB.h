@@ -30,13 +30,8 @@
 /***********************************************************************/
 /*Global Function Prototype*/
 /***********************************************************************/
-void usb_printf(pchar format,...);
 void init_usb(void);
-
-
-void init_asclin3(void);
-void write_asclin3_uart(const uint8 chr);
-uint8 read_asclin3_uart(void);
+void _usb_printf(pchar format,...);
 
 
 #endif /* DEVICEDRIVER_DRIVER_USB_H_ */
