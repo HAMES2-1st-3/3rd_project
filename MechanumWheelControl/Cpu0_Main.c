@@ -32,6 +32,7 @@
 #include <Driver_Potentiometer.h>
 #include <Driver_ToF.h>
 #include <Driver_USB.h>
+#include <Driver_Bluetooth.h>
 
 #include <Driver_Buzzer.h>
 #include <Driver_WheelFL.h>
@@ -67,7 +68,8 @@ void core0_main(void)
     init_buzzer();
     init_joystick();
     init_usb();
-
+    init_bluetooth();
+    init_bluetooth_master();
     init_wheelFL();
     init_wheelFR();
     init_wheelRL();

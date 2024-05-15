@@ -105,17 +105,17 @@ static void AppTask20ms(void)
 static void AppTask50ms(void)
 {
     float32 poten = get_potentiometer_data(); // 100% ~ 0%
-    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
-    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
+//    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
+//    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
     sint32 dist = get_tof_distance(); // mm value
 
-    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
-            poten,
-            dist,
-            JM.x,
-            JM.y,
-            JR.x,
-            JR.y);
+//    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
+//            poten,
+//            dist,
+//            JM.x,
+//            JM.y,
+//            JR.x,
+//            JR.y);
 
     set_wheelFL_dutycycle(poten*2-100);
     set_wheelFR_dutycycle(poten*2-100);

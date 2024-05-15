@@ -191,7 +191,7 @@ JoystickValue get_joystick_rotate_value(void){
     conversion_res=IfxVadc_Adc_getResult(&s_adc2_channel[ADC_GROUP2_CH4]); //y_val
     value.y=(uint32)conversion_res.B.RESULT;
 
-    usb_printf("I: rotate_x_val:%u,rotate_y_val:%u\n",value.x,value.y);
+//    usb_printf("I: rotate_x_val:%u,rotate_y_val:%u\n",value.x,value.y);
 
     return value;
 }
