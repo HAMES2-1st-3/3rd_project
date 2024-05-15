@@ -52,6 +52,7 @@ static IfxAsclin_Asc s_asclin2;
 static uint8 s_asclin2_tx_buf[ASC2_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 static uint8 s_asclin2_rx_buf[ASC2_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 
+JoystickValueForBT g_joystick;
 /***********************************************************************/
 
 /*Function*/
@@ -93,6 +94,16 @@ void init_bluetooth(void) {
     IfxAsclin_Asc_initModule(&s_asclin2, &asc_conf);
 }
 
+
+void make_bluetooth_msg(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
+    char message[USB_UART_MAX_PRINT_SIZE + 1];
+
+    snprintf(message, sizeof(message), "%u %u %u %u", x_mv, y_mv, x_rt, y_rt);
+
+    send_data(message);
+}
+
+
 void send_data(pchar format) {
     char      message[USB_UART_MAX_PRINT_SIZE + 1];
     Ifx_SizeT count;
@@ -117,9 +128,30 @@ void send_data(pchar format) {
     }
 }
 
-char receive_data(void) {
-    return IfxAsclin_Asc_blockingRead(&s_asclin2);
+JoystickValueForBT receive_data(void) {
+    char buffer[USB_UART_MAX_PRINT_SIZE + 1];
+    Ifx_SizeT count = 0;
+    char ch;
+
+    // Read characters into the buffer until we reach the end of the message or the buffer is full
+    do {
+        ch = IfxAsclin_Asc_blockingRead(&s_asclin2);
+        if (ch != '\r' && ch != '\n' && count < USB_UART_MAX_PRINT_SIZE) {
+            buffer[count++] = ch;
+        }
+    } while (ch != '\r' && ch != '\n' && count < USB_UART_MAX_PRINT_SIZE);
+
+    buffer[count] = '\0'; // Null-terminate the string
+
+    // Parse the received string into the JoystickValue structure
+    JoystickValueForBT joystick;
+    if (sscanf(buffer, "%u %u %u %u", &joystick.move_x, &joystick.move_y, &joystick.rotate_x, &joystick.rotate_y) == 4) {
+        g_joystick = joystick; // Update the global joystick value
+    }
+
+    return g_joystick;
 }
+
 
 void send_at_command(pchar command) {
     send_data(command);
@@ -140,6 +172,7 @@ void init_bluetooth_master(void) {
 
       you can use the value of 'receivedChar'
     */
+
 }
 
 void init_bluetooth_slave(void) {

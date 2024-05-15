@@ -21,6 +21,7 @@
 #include <Driver_Potentiometer.h>
 #include <Driver_ToF.h>
 #include <Driver_USB.h>
+#include <Driver_Bluetooth.h>
 
 #include <Driver_Buzzer.h>
 #include <Driver_WheelFL.h>
@@ -98,15 +99,19 @@ static void AppTask10ms(void)
 }
 static void AppTask20ms(void)
 {
-//    g_rpm_ref = get_rpm_reference();
+    //g_rpm_ref = get_rpm_reference();
 
 
 }
 static void AppTask50ms(void)
 {
     float32 poten = get_potentiometer_data(); // 100% ~ 0%
-//    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
-//    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
+    JoystickValue move = get_joystick_move_value(); // 100% ~ 0%
+    JoystickValue rotate = get_joystick_rotate_value(); // 100% ~ 0%
+
+    make_bluetooth_msg(move.x, move.y, rotate.x, rotate.y);
+
+
     sint32 dist = get_tof_distance(); // mm value
 
 //    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
