@@ -97,22 +97,28 @@ estimate_state_var observer_theta_fl(float32 Ts){ //frontLeft motor theta observ
 
     return g_estimate_state_var; //goal: theta_tilde->0 (error->0)
 }
-void opened_loop_control(void)
+void opened_loop_control(uint32 ms)
 {
     set_wheelFL_dutycycle((float32)((float32)g_ref_rpm.fl/ RPM_MAX * 100.0));
-    set_wheelFR_dutycycle((float32)((float32)g_ref_rpm.fr/ RPM_MAX * 100.0));
-    set_wheelRL_dutycycle((float32)((float32)g_ref_rpm.rl/ RPM_MAX * 100.0));
-    set_wheelRR_dutycycle((float32)((float32)g_ref_rpm.rr/ RPM_MAX * 100.0));
+    //set_wheelFR_dutycycle((float32)((float32)g_ref_rpm.fr/ RPM_MAX * 100.0));
+    float32 duty = ms/50000.0 * 100; // 10s -> 100duty
+    if(duty >= 100){
+        duty = 100;
+    }
+    //g_cur_rpm.fl=get_derivative(get_wheelFL_tick(),0.001)*(60/22.0);
+    //set_wheelFL_dutycycle(duty);
+    //set_wheelRR_dutycycle((float32)((float32)g_ref_rpm.rr/ RPM_MAX * 100.0));
 }
 void closed_loop_control(float32 kp, float32 ki, float32 Ts)
 {
     //get current rpm from encoder ticks
     //����ȯ �ʿ�?
-    //g_cur_rpm.fl=get_derivative(get_wheelFL_tick(),Ts)*(60/22.0); // multiply rpm scailing 60/22.0
+//    g_cur_rpm.fl=get_derivative(get_wheelFL_tick(),Ts)*(60/22.0); // multiply rpm scailing 60/22.0
 
     g_cur_rpm.fr=get_derivative(get_wheelFR_tick(),Ts)*(60/22.0); // multiply rpm scailing
-    //g_cur_rpm.rl=get_derivative(get_wheelRL_tick(),Ts)*(60/22.0); // multiply rpm scailing
-    //g_cur_rpm.rr=get_derivative(get_wheelRR_tick(),Ts)*(60/22.0); // multiply rpm scailing
+   // g_cur_rpm.rl=get_derivative(get_wheelRL_tick(),Ts)*(60/22.0); // multiply rpm scailing
+    g_cur_rpm.rl=get_derivative(get_wheelFR_tick(),Ts)*(60/22.0); // multiply rpm scailing
+//    g_cur_rpm.rr=get_derivative(get_wheelRR_tick(),Ts)*(60/22.0); // multiply rpm scailing
 
     //watch only fl
 
@@ -174,8 +180,8 @@ void closed_loop_control(float32 kp, float32 ki, float32 Ts)
 
     //set_wheelFL_dutycycle(control_output.fl);
     set_wheelFR_dutycycle(control_output.fr);
-    //set_wheelRL_dutycycle(control_output.rl);
-    //set_wheelRR_dutycycle(control_output.rr);
+    set_wheelRL_dutycycle(control_output.rl);
+//    set_wheelRR_dutycycle(control_output.rr);
     return;
 }
 
@@ -260,11 +266,13 @@ static float32 get_derivative(sint32 ticks,float32 Ts){
     static sint32 ticks_old=0;
     static float32 w_old=0;
     float32 w=0;
-
+    sint32 cutoff = 70;
+    if(ticks > 0)
+        cutoff = 10;
 
     w=(ticks-ticks_old)/Ts;
 
-    w=LPF(w_old,w,100,Ts); //500: freq ==> need change& tunning
+    w=LPF(w_old,w,cutoff,Ts); //500: freq ==> need change& tunning
     //usb_printf("ticks:%d, ticks_old:%d, w: %lf\n,",ticks,ticks_old,w);
 
     ticks_old=ticks;

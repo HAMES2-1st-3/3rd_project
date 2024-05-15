@@ -83,15 +83,17 @@ uint8 g_state;
 uint8 g_sub_state;
 float32 g_rpm_ref;
 float32 theta_tilde;
-
+uint32  cnt;
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
 
 static void AppTask1ms(void)
 {
+    cnt++;
     set_all_wheel(g_state, g_sub_state, g_rpm_ref);
-    closed_loop_control(0.01,1.0, 0.001);
+    //opened_loop_control(cnt);
+    closed_loop_control(0.043, 0.3, 0.001);
    // theta_tilde=observer_theta_fl(0.001).theta_tilde;
 }
 
@@ -109,7 +111,7 @@ static void AppTask20ms(void)
 static void AppTask50ms(void)
 {
     //_usb_printf("theta_tilde(theta-theta_hat)=%lf\n",theta_tilde);
-    _usb_printf("g_ref_rpm.fr:%lf, g_cur_rpm.fr:%lf\n",g_ref_rpm.fr,g_cur_rpm.fr);
+    _usb_printf("g_ref_rpm.rl:%lf, g_cur_rpm.rl:%lf\n",g_ref_rpm.rl,g_cur_rpm.rl);
 //    float32 poten = get_potentiometer_data(); // 100% ~ 0%
 //    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
 //    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%

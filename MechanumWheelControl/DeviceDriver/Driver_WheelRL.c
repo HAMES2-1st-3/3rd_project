@@ -60,7 +60,7 @@ static IfxGtm_Tom_Pwm_Driver s_tomDriver_motor;
 
 
 static float32 s_encoder_data = 0;  // 48 per rotate
-
+//static sint32 s_encoder_data = 0;  // 48 per rotate
 
 /*********************************************************************************************************************/
 /*------------------------------------------------Function Prototypes------------------------------------------------*/
@@ -220,6 +220,7 @@ void encoderRL_chA_ISR(void){
     if(IfxPort_getPinState(_P_ENCODERRL_CHA)) { // rising edge triggered
         if(IfxPort_getPinState(_P_ENCODERRL_CHB)) {
             s_encoder_data -= (75/57.0);
+            //s_encoder_data -=1;
         } else {
             s_encoder_data += 1;
         }
@@ -228,6 +229,7 @@ void encoderRL_chA_ISR(void){
             s_encoder_data += 1;
         } else {
             s_encoder_data -= (75/57.0);
+            //s_encoder_data -= 1;
         }
     }
 }
