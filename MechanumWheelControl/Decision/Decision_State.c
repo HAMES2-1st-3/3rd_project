@@ -37,10 +37,6 @@
 /***********************************************************************/
 /*Variable*/
 /***********************************************************************/
-uint32 g_move_x_val =0;
-uint32 g_move_y_val =0;
-uint32 g_rotate_x_val =0;
-uint32 g_rotate_y_val =0;
 static uint32 s_state=0;
 
 /***********************************************************************/
@@ -49,45 +45,41 @@ static uint32 s_state=0;
 uint32 get_state(void)
 {
 
-    /*ADC Test*/
-    JoystickValue move_raw   = get_joystick_rotate_value();
-    JoystickValue rotate_raw = get_joystick_move_value();
+    JoystickValue move;
+    JoystickValue rotate;
+    move = get_joystick_move_value();
+    rotate = get_joystick_rotate_value();
 
-    g_move_x_val= move_raw.x;
-    g_move_y_val= move_raw.y;
-
-    if(g_move_x_val <= 1570 && g_move_y_val <= 1570){
-        s_state = 0;
-    }
-    else if(g_move_x_val >=3350 && g_move_y_val <= 1570){
+    if(move.x <= 1570 && move.y <= 1570){
         s_state = 2;
     }
-    else if(g_move_x_val <=1570 && g_move_y_val > 3350){
-        s_state = 6;
+    else if(move.x >=3350 && move.y <= 1570){
+        s_state = 0;
     }
-    else if(g_move_x_val >= 3350 && g_move_y_val > 3350){
+    else if(move.x <=1570 && move.y > 3350){
         s_state = 8;
     }
-    else if(g_move_x_val < 3350 && g_move_y_val < 1570){
+    else if(move.x >= 3350 && move.y > 3350){
+        s_state = 6;
+    }
+    else if(move.x < 3350 && move.y < 1570){
         s_state = 1;
     }
-    else if(g_move_x_val >= 3350 && g_move_y_val <= 3350){
-        s_state = 5;
-    }
-    else if(g_move_x_val < 3350 && g_move_y_val > 3350){
-        s_state = 7;
-    }
-    else if(g_move_x_val <= 1570 && g_move_y_val <= 3350){
+    else if(move.x >= 3350 && move.y <= 3350){
         s_state = 3;
     }
+    else if(move.x < 3350 && move.y > 3350){
+        s_state = 7;
+    }
+    else if(move.x <= 1570 && move.y <= 3350){
+        s_state = 5;
+    }
     else {
-        g_rotate_x_val= rotate_raw.x;
-        g_rotate_y_val= rotate_raw.y;
-        if(g_rotate_x_val>=3350 && g_rotate_y_val<3350 &&g_rotate_y_val>=1570){
-            s_state = 9;
-        }
-        else if(g_rotate_x_val<=1570 &&g_rotate_y_val<3350 &&g_rotate_y_val>=1570){
+        if(rotate.x>=3350 && rotate.y<3350 &&rotate.y>=1570){
             s_state = 10;
+        }
+        else if(rotate.x<=1570 &&rotate.y<3350 &&rotate.y>=1570){
+            s_state = 9;
         }
         else s_state =4;
     }
