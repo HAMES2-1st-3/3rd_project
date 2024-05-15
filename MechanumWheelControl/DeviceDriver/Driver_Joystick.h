@@ -50,14 +50,20 @@ typedef enum{
 }ADC_GROUP2;
 
 
-typedef struct{ //¼¾½Ì º¯¼ö
+typedef struct{ //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         uint32 UlSSense1_Raw;
         uint32 UlSSense2_Raw;
         uint32 UlSSense3_Raw;
 }SensorAdcRaw;
 
-extern SensorAdcRaw g_adc0_raw; //Àü·Â ¼¾½Ì º¯¼ö
-extern SensorAdcRaw g_adc2_raw; //Àü·Â ¼¾½Ì º¯¼ö
+typedef struct{ //ì„¼ì‹± ë³€ìˆ˜
+        uint32 x;
+        uint32 y;
+        boolean sw;
+}JoystickValue;
+
+extern SensorAdcRaw g_adc0_raw; //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+extern SensorAdcRaw g_adc2_raw; //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 /***********************************************************************/
 /*Define*/
@@ -74,7 +80,7 @@ extern SensorAdcRaw g_adc2_raw; //Àü·Â ¼¾½Ì º¯¼ö
 /***********************************************************************/
 
 void init_joystick(void);
-void get_adc_group0_raw(void);
-void get_adc_group2_raw(void);
+JoystickValue get_joystick_move_value(void);
+JoystickValue get_joystick_rotate_value(void);
 
 #endif /* DRIVER_JOYSTICK */
