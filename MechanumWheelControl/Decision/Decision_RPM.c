@@ -36,7 +36,6 @@
 uint32 g_pot_raw;
 uint32 g_rpm_max;
 float32 ref_rpm;
-uint8 state_val;
 
 /*******************
  * ****************************************************/
@@ -51,7 +50,6 @@ void get_rpm_max(void)
 float32 get_rpm_reference(uint8 state)
 {
     get_rpm_max();
-    state_val = state;
 
     static JoystickValue move;
     static JoystickValue rotate;
@@ -59,36 +57,35 @@ float32 get_rpm_reference(uint8 state)
     move = get_joystick_move_value();
     rotate = get_joystick_rotate_value();
     //usb_printf("O: rotate_x_val:%u,rotate_y_val:%u\n",rotate.x,rotate.y);
-    if(state_val ==2 ||state_val ==1 || state_val ==0) //state 0,1,2
+    if(state ==2 ||state ==1 || state ==0) //state 0,1,2
     {
-        ref_rpm = abs((float)move.y - 1570)/(1570.0) * g_rpm_max;
+        ref_rpm = abs((float)move.y - 1570)/(1570) * g_rpm_max;
     }
-    else if(state_val ==3) //state 3
+    else if(state ==3) //state 3
     {
-        ref_rpm = abs((float)move.x-3350)/(4095.0-3350.0)*g_rpm_max;
+        ref_rpm = abs((float)move.x-3350)/(4095-3350)*g_rpm_max;
     }
-    else if(state_val ==4) //state 4
+    else if(state ==4) //state 4
     {
         ref_rpm = 0;
     }
-    else if(state_val ==5) //state 5
+    else if(state ==5) //state 5
     {
-        ref_rpm = abs((float)move.x-1570)/(1570.0)*g_rpm_max;
+        ref_rpm = abs((float)move.x-1570)/(1570)*g_rpm_max;
     }
-    else if(state_val ==8 ||state_val ==7 ||state_val ==6) //state 6 7 8
+    else if(state ==8 ||state ==7 ||state ==6) //state 6 7 8
     {
-        ref_rpm = abs((float)move.y-3350)/(4095.0-3350.0)*g_rpm_max;
+        ref_rpm = abs((float)move.y-3350)/(4095-3350)*g_rpm_max;
     }
-    else if(state_val ==9) //state 9
+    else if(state ==9) //state 9
     {
-        ref_rpm = abs((float)rotate.x-1570)/(1570.0)*g_rpm_max;
+        ref_rpm = abs((float)rotate.x-1570)/(1570)*g_rpm_max;
     }
     else //state 10
     {
-        ref_rpm = abs((float)rotate.x-3350)/(4095.0-3350.0)*g_rpm_max;
+        ref_rpm = abs((float)rotate.x-3350)/(4095-3350)*g_rpm_max;
     }
-    //usb_printf("rotate_x_val:%u,rotate_y_val:%u\n",rotate.x,rotate.y);
-    //usb_printf("ref_rpm:%.3f",ref_rpm);
+
     return ref_rpm;
 }
 
