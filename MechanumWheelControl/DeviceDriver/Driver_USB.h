@@ -31,7 +31,7 @@
 /*Global Function Prototype*/
 /***********************************************************************/
 void init_usb(void);
-void set_usb_printf(pchar format,...);
+void _usb_printf(pchar format,...);
 
 
 #endif /* DEVICEDRIVER_DRIVER_USB_H_ */

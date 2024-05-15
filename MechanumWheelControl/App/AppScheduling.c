@@ -109,7 +109,7 @@ static void AppTask50ms(void)
     JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
     sint32 dist = get_tof_distance(); // mm value
 
-    set_usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
+    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
             poten,
             dist,
             JM.x,
