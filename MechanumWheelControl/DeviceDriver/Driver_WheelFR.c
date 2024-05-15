@@ -228,7 +228,7 @@ static inline float32 get_motorFR_speed(void) {
 
 // 1 : CW, 0 : CCW
 static inline boolean get_motorFR_direction(void){
-    return IfxPort_getPinState(MOTOR_PWM);
+    return IfxPort_getPinState(_P_MOTORFR_DIR);
 }
 
 

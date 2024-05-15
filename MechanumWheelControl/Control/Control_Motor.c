@@ -243,4 +243,3 @@ static float32 saturation(float32 bottom, float32 high, float32 target){
 static float32 LPF(float32 Y_fill_d,float32 u,float32 cf,float32 T){ // cf=cutoff
     return (1-T*cf)*Y_fill_d+T*cf*u;
 }
-

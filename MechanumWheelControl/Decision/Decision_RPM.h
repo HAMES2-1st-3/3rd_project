@@ -31,8 +31,7 @@
 /***********************************************************************/
 /*Global Function Prototype*/ 
 /***********************************************************************/
-uint32 get_rpm_reference(void);
-
-
+void get_rpm_max(void);
+float32 get_rpm_reference(uint8 state);
 
 #endif /* DECISION_DECISION_RPM_H_ */

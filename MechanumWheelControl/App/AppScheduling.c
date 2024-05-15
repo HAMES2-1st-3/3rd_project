@@ -54,50 +54,76 @@ static void AppTask500ms(void);
 /*Variable*/ 
 /***********************************************************************/
 
+
+struct
+{
+    Ifx_STM             *stmSfr;            /**< \brief Pointer to Stm register base */
+    IfxStm_CompareConfig stmConfig;         /**< \brief Stm Configuration structure */
+    volatile uint8       LedBlink;          /**< \brief LED state variable */
+    volatile uint32      counter;           /**< \brief interrupt counter */
+} g_stm; /**< \brief Stm global data */
+
+struct
+{
+    uint8 scheduling_flag_1ms;
+    uint8 scheduling_flag_10ms;
+    uint8 scheduling_flag_20ms;
+    uint8 scheduling_flag_50ms;
+    uint8 scheduling_flag_100ms;
+    uint8 scheduling_flag_250ms;
+    uint8 scheduling_flag_500ms;
+}g_scheduling_info;
+
+uint32 g_counter_1ms = 0u;
+
+/***********************************************************************/
+/*User Variable*/
+/***********************************************************************/
+uint8 g_state;
 uint8 g_sub_state;
-uint32 g_rpm_ref;
+float32 g_rpm_ref;
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
 
 static void AppTask1ms(void)
 {
-
+    set_all_wheel(g_state, g_sub_state, g_rpm_ref);
+    opened_loop_control();
 }
 
 static void AppTask10ms(void)
 {
+    g_state = get_state();
+    g_sub_state = 0;
 //    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
 {
-//    g_rpm_ref = get_rpm_reference();
+    g_rpm_ref = get_rpm_reference(g_state);
 
 
 }
 static void AppTask50ms(void)
 {
-    { // for test
-    uint32 temp = get_potentiometer_value();
-
-    set_wheelFL_dutycycle((float32)temp / 4095 * 200 - 100);
-    set_wheelFR_dutycycle((float32)temp / 4095 * 200 - 100);
-    set_wheelRL_dutycycle((float32)temp / 4095 * 200 - 100);
-    set_wheelRR_dutycycle((float32)temp / 4095 * 200 - 100);
-
-//    usb_printf("P:%d, FL:%d, FR:%d, RL:%d, RR:%d, Tof:%d\n",
-//            get_potentiometer_value(),
-//            get_wheelFL_tick(),
-//            get_wheelFR_tick(),
-//            get_wheelRL_tick(),
-//            get_wheelRR_tick(),
-//            get_tof_distance());
-    usb_printf("JoyM_x:%u, JoyM_y:%u, JoyR_x:%u, JoyR_y:%u\n",
-            get_mid_adc_group0_raw()->UlSSense1_Raw,
-            get_mid_adc_group0_raw()->UlSSense2_Raw,
-            get_mid_adc_group2_raw()->UlSSense1_Raw,
-            get_mid_adc_group2_raw()->UlSSense2_Raw);
-    }
+    _usb_printf("rpm_ref:%lf, state: %u\n", g_ref_rpm.fl, g_state);
+//    float32 poten = get_potentiometer_data(); // 100% ~ 0%
+//    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
+//    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
+//    sint32 dist = get_tof_distance(); // mm value
+//
+//    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
+//            poten,
+//            dist,
+//            JM.x,
+//            JM.y,
+//            JR.x,
+//            JR.y);
+//
+//    set_wheelFL_dutycycle(poten*2-100);
+//    set_wheelFR_dutycycle(poten*2-100);
+//    set_wheelRL_dutycycle(poten*2-100);
+//    set_wheelRR_dutycycle(poten*2-100);
 
 }
 static void AppTask100ms(void)

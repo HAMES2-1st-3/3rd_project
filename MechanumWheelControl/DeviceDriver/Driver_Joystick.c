@@ -22,11 +22,13 @@ typedef struct
     IfxVadc_Adc_Group adcGroup;
 } App_VadcAutoScan;
 
+
+
 /***********************************************************************/
 /*Static Function Prototype*/
 /***********************************************************************/
-static void init_adc0(void);
-static void init_adc2(void);
+static void init_joystick_move(void);
+static void init_joystick_rotate(void);
 static void init_group0_channel(uint8 param_ChNum);
 static void init_group2_channel(uint8 param_ChNum);
 
@@ -36,9 +38,7 @@ static void init_group2_channel(uint8 param_ChNum);
 App_VadcAutoScan s_vadc_autoscan0;
 App_VadcAutoScan s_vadc_autoscan2;
 static IfxVadc_Adc_Channel s_adc0_channel[ADC_GROUP0_MAX];
-SensorAdcRaw g_adc0_raw;
-SensorAdcRaw g_adc2_raw;
-
+static IfxVadc_Adc_Channel s_adc2_channel[ADC_GROUP2_MAX];
 /***********************************************************************/
 /*Function*/
 /***********************************************************************/
@@ -46,11 +46,11 @@ SensorAdcRaw g_adc2_raw;
 void init_joystick(void)
 {
     /*ADC0 Converter Init*/
-    init_adc0();
-    init_adc2();
+    init_joystick_move();
+    init_joystick_rotate();
 }
 
-static void init_adc0(void)
+static void init_joystick_move(void)
 {
 
     /* VADC Configuration */
@@ -90,7 +90,7 @@ static void init_adc0(void)
 
 }
 
-static void init_adc2(void)
+static void init_joystick_rotate(void)
 {
 
     /* VADC Configuration */
@@ -160,32 +160,38 @@ static void init_group2_channel(uint8 param_ChNum)
     g_adc_channel_configInfo.resultRegister = (IfxVadc_ChannelResult)(param_ChNum);
 
     /*Initialize the channel*/
-    IfxVadc_Adc_initChannel(&s_adc0_channel[param_ChNum],&g_adc_channel_configInfo);
+    IfxVadc_Adc_initChannel(&s_adc2_channel[param_ChNum],&g_adc_channel_configInfo);
 
     /*add to scan*/
     IfxVadc_Adc_setScan(&s_vadc_autoscan2.adcGroup,ulTemp,ulTemp);
 
 }
 
-void get_adc_group0_raw(void){
+JoystickValue get_joystick_move_value(void){
 
-    Ifx_VADC_RES conversion_res;
-
+    JoystickValue value;
+    volatile Ifx_VADC_RES conversion_res;
 
     conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP0_CH3]); //x_val
-    g_adc0_raw.UlSSense1_Raw=conversion_res.B.RESULT;
+    value.x=conversion_res.B.RESULT;
     conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP0_CH2]); //y_val
-    g_adc0_raw.UlSSense2_Raw=conversion_res.B.RESULT;
+    value.y=conversion_res.B.RESULT;
+
+    return value;
 }
 
 
-void get_adc_group2_raw(void){
+JoystickValue get_joystick_rotate_value(void){
 
-    Ifx_VADC_RES conversion_res;
+    JoystickValue value;
+    volatile Ifx_VADC_RES conversion_res;
 
+    conversion_res=IfxVadc_Adc_getResult(&s_adc2_channel[ADC_GROUP2_CH5]); //x_val
+    value.x=(uint32)conversion_res.B.RESULT;
+    conversion_res=IfxVadc_Adc_getResult(&s_adc2_channel[ADC_GROUP2_CH4]); //y_val
+    value.y=(uint32)conversion_res.B.RESULT;
 
-    conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP2_CH5]); //x_val
-    g_adc2_raw.UlSSense1_Raw=conversion_res.B.RESULT;
-    conversion_res=IfxVadc_Adc_getResult(&s_adc0_channel[ADC_GROUP2_CH4]); //y_val
-    g_adc2_raw.UlSSense2_Raw=conversion_res.B.RESULT;
+    usb_printf("I: rotate_x_val:%u,rotate_y_val:%u\n",value.x,value.y);
+
+    return value;
 }

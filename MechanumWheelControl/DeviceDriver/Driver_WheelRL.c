@@ -78,7 +78,7 @@ static IfxGtm_Tom_Pwm_Config s_tomConfig_motor;                                 
 static IfxGtm_Tom_Pwm_Driver s_tomDriver_motor;
 
 
-static sint32 s_encoder_data = 0;  // 48 per rotate
+static float32 s_encoder_data = 0;  // 48 per rotate
 
 
 /*********************************************************************************************************************/
@@ -96,7 +96,9 @@ static inline float32 get_motorRL_speed(void);
 static inline boolean get_motorRL_direction(void);
 
 static inline sint32 get_encoderRL_tick(void);
-
+uint32 cnt;
+uint32 p_cnt;
+uint32 n_cnt;
 
 /*********************************************************************************************************************/
 /*-------------------------------------------wheel driver Implementations--------------------------------------------*/
@@ -228,7 +230,7 @@ static inline float32 get_motorRL_speed(void) {
 
 // 1 : CW, 0 : CCW
 static inline boolean get_motorRL_direction(void){
-    return IfxPort_getPinState(MOTOR_PWM);
+    return IfxPort_getPinState(_P_MOTORRL_DIR);
 }
 
 
@@ -238,17 +240,22 @@ static inline boolean get_motorRL_direction(void){
 
 IFX_INTERRUPT(encoderRL_chA_ISR, 0, ISR_PRIORITY_SCUERU2);
 void encoderRL_chA_ISR(void){
-    if(IfxPort_getPinState(ENCODER_CHA)) { // rising edge triggered
-        if(IfxPort_getPinState(ENCODER_CHB)) {
-            s_encoder_data--;
+    cnt++;
+    if(IfxPort_getPinState(_P_ENCODERRL_CHA)) { // rising edge triggered
+        if(IfxPort_getPinState(_P_ENCODERRL_CHB)) {
+            s_encoder_data -= (75/57.0);
+            n_cnt++;
         } else {
-            s_encoder_data++;
+            s_encoder_data += 1;
+            p_cnt++;
         }
     } else { // falling edge triggered
-        if(IfxPort_getPinState(ENCODER_CHB)) {
-            s_encoder_data++;
+        if(IfxPort_getPinState(_P_ENCODERRL_CHB)) {
+            s_encoder_data += 1;
+            p_cnt++;
         } else {
-            s_encoder_data--;
+            s_encoder_data -= (75/57.0);
+            n_cnt++;
         }
     }
 }
@@ -285,6 +292,6 @@ void init_encoderRL(void) {
 }
 
 static inline sint32 get_encoderRL_tick(void) {
-    return s_encoder_data;
+    return (sint32)s_encoder_data;
 }
 
