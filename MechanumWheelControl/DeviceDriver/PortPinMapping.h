@@ -1,5 +1,5 @@
 /**********************************************************************************************************************
- * \file Driver_WheelFL.h
+ * \file PortPin_mapping.h
  * \copyright Copyright (C) Infineon Technologies AG 2019
  * 
  * Use of this file is subject to the terms of use agreed between (i) you or the company in which ordinary course of 
@@ -25,18 +25,99 @@
  * IN THE SOFTWARE.
  *********************************************************************************************************************/
 
-#ifndef DEVICEDRIVER_DRIVER_WHEELFL_H_
-#define DEVICEDRIVER_DRIVER_WHEELFL_H_
+#ifndef DEVICEDRIVER_PORTPINMAPPING_H_
+#define DEVICEDRIVER_PORTPINMAPPING_H_
 
 /*********************************************************************************************************************/
 /*-----------------------------------------------------Includes------------------------------------------------------*/
 /*********************************************************************************************************************/
-#include "Ifx_Types.h"
 
 /*********************************************************************************************************************/
 /*------------------------------------------------------Macros-------------------------------------------------------*/
 /*********************************************************************************************************************/
 
+#define _M_BUZZER_TOUTMAP   IfxGtm_TOM0_11_TOUT3_P02_3_OUT
+#define _P_BUZZER               &MODULE_P02,3
+
+#define _P_JOYSTICK_MOVE_X      &MODULE_P33,6
+#define _P_JOYSTICK_MOVE_Y      &MODULE_P22,2
+#define _P_JOYSTICK_ROTATE_X    &MODULE_P23,3
+#define _P_JOYSTICK_ROTATE_Y    &MODULE_P20,6
+
+
+#define _P_POTENTIOMETER            &MODULE_P10,0
+#define _M_POTENTIOMETER_ADC_GP_ID  IfxVadc_GroupId_3
+#define _M_POTENTIOMETER_ADC_CH_ID  IfxVadc_ChannelId_1
+
+
+#define _P_JOYSTICK_MOVE_X              &MODULE_P33,6
+#define _P_JOYSTICK_MOVE_Y              &MODULE_P22,2
+#define _M_JOYSTICK_MOVE_ADC_GP_ID      IfxVadc_GroupId_0
+#define _M_JOYSTICK_MOVE_X_ADC_CH_ID    IfxVadc_ChannelId_3
+#define _M_JOYSTICK_MOVE_Y_ADC_CH_ID    IfxVadc_ChannelId_2
+
+
+#define _P_JOYSTICK_ROTATE_X              &MODULE_P23,3
+#define _P_JOYSTICK_ROTATE_Y              &MODULE_P20,6
+#define _M_JOYSTICK_ROTATE_ADC_GP_ID      IfxVadc_GroupId_2
+#define _M_JOYSTICK_ROTATE_X_ADC_CH_ID    IfxVadc_ChannelId_5
+#define _M_JOYSTICK_ROTATE_Y_ADC_CH_ID    IfxVadc_ChannelId_4
+
+
+
+
+/* TX0, RX0 mark on TC275 */
+#define _M_TOF_TX_OUT           IfxAsclin1_TX_P15_0_OUT
+#define _M_TOF_RX_IN            IfxAsclin1_RXA_P15_1_IN
+
+/* TX1, RX1 mark on TC275 */
+#define _M_BLUETOOTH_TX_OUT     IfxAsclin2_SCLK_P33_9_OUT
+#define _M_BLUETOOTH_RX_IN      IfxAsclin2_RXE_P33_8_IN
+
+/* USB on TC275 */
+#define _M_USB_TX_OUT           IfxAsclin3_TX_P15_7_OUT
+#define _M_USB_RX_IN            IfxAsclin3_RXD_P32_2_IN
+
+
+
+
+#define _M_MOTORFL_PWM_TOUTMAP          IfxGtm_TOM0_9_TOUT1_P02_1_OUT         /* LED_PWM which will be driven by the PWM          */
+#define _P_MOTORFL_PWM                  &MODULE_P02,1
+#define _P_MOTORFL_DIR                  &MODULE_P10,1
+
+#define _M_ENCODERFL_CHA_REQ_IN         (IfxScu_REQ15_P14_1_IN)
+#define _P_ENCODERFL_CHA                &MODULE_P14,1
+#define _P_ENCODERFL_CHB                &MODULE_P00,0
+
+/*--------------------------------------------------------*/
+
+#define _M_MOTORFR_PWM_TOUTMAP          IfxGtm_TOM0_3_TOUT105_P10_3_OUT         /* LED_PWM which will be driven by the PWM          */
+#define _P_MOTORFR_PWM                  &MODULE_P10,3
+#define _P_MOTORFR_DIR                  &MODULE_P10,2
+
+#define _M_ENCODERFR_CHA_REQ_IN         (IfxScu_REQ7_P00_4_IN)
+#define _P_ENCODERFR_CHA                &MODULE_P00,4
+#define _P_ENCODERFR_CHB                &MODULE_P00,5
+
+/*--------------------------------------------------------*/
+
+#define _M_MOTORRL_PWM_TOUTMAP          IfxGtm_TOM2_3_TOUT97_P11_6_OUT         /* LED_PWM which will be driven by the PWM          */
+#define _P_MOTORRL_PWM                  &MODULE_P11,6
+#define _P_MOTORRL_DIR                  &MODULE_P21,0
+
+#define _M_ENCODERRL_CHA_REQ_IN         (IfxScu_REQ8_P33_7_IN)
+#define _P_ENCODERRL_CHA                &MODULE_P33,7
+#define _P_ENCODERRL_CHB                &MODULE_P33,12
+
+/*--------------------------------------------------------*/
+
+#define _M_MOTORRR_PWM_TOUTMAP          IfxGtm_TOM1_6_TOUT24_P33_2_OUT         /* LED_PWM which will be driven by the PWM          */
+#define _P_MOTORRR_PWM                  &MODULE_P33,2
+#define _P_MOTORRR_DIR                  &MODULE_P33,1
+
+#define _M_ENCODERRR_CHA_REQ_IN         (IfxScu_REQ12_P11_10_IN)
+#define _P_ENCODERRR_CHA                &MODULE_P11,10
+#define _P_ENCODERRR_CHB                &MODULE_P33,0
 
 
 
@@ -56,18 +137,5 @@
 /*------------------------------------------------Function Prototypes------------------------------------------------*/
 /*********************************************************************************************************************/
 
-void init_wheelFL(void);
 
-/* duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002% */
-void set_wheelFL_dutycycle(float32 dutycycle); // dutycycle : 100f ~ -100f
-
-// 100% ~ -100%
-float32 get_wheelFL_dutycycle(void);
-
-sint32 get_wheelFL_tick(void);
-
-
-
-
-
-#endif /* DEVICEDRIVER_DRIVER_WHEELFL_H_ */
+#endif /* DEVICEDRIVER_PORTPINMAPPING_H_ */

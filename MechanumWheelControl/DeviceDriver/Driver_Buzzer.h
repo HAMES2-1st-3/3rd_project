@@ -12,10 +12,7 @@
 /*Include*/ 
 /***********************************************************************/
 #include "Ifx_Types.h"
-#include "IfxPort.h"
-#include "IfxPort_PinMap.h"
-#include "IfxGtm_PinMap.h"
-#include "IfxGtm_Tom_Pwm.h"
+
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
@@ -32,11 +29,20 @@
 /*Global Function Prototype*/ 
 /***********************************************************************/
 
+/*
+ * in 'init_buzzer()', it 'use set_buzzer_intensity(50)'
+ * if you want to use buzzer, you just use 'init_buzzer()' in main()
+ */
+void init_buzzer(void);                         /* initialize buzzer */
 
-void init_buzzer(void);
-void makesound(uint16 soundIdx,float32 sound_intensity );
-void toggle_buzzer(void);
-void start_buzzer(void);
-void stop_buzzer(void);
-void set_buzzer_dutycycle(float32 sound_intensity);                               /* Function to set the duty cycle of the PWM    */
+/*
+ * if you want to set other buzzer intensity
+ * set intensity 100~0
+ */
+void set_buzzer_intensity(float32 intensity);
+
+void set_buzzer_toggle(void);
+void set_buzzer_off(void);
+void set_buzzer_on(void);
+                           /* Function to set the duty cycle of the PWM    */
 #endif /* DEVICEDRIVER_DRIVER_BUZZER_H_ */

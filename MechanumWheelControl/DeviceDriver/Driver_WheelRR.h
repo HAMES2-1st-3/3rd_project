@@ -33,8 +33,6 @@
 /*********************************************************************************************************************/
 #include "Ifx_Types.h"
 
-#include <Wheel_Property.h>
-
 /*********************************************************************************************************************/
 /*------------------------------------------------------Macros-------------------------------------------------------*/
 /*********************************************************************************************************************/
@@ -63,18 +61,8 @@ void set_wheelRR_dutycycle(float32 dutycycle); // dutycycle : 100f ~ -100f
 // 100% ~ -100%
 float32 get_wheelRR_dutycycle(void);
 
-// 0% ~ 100%
-float32 get_wheelRR_speed(void);
-
-// 1 : forward, 0 : backward
-boolean get_wheelRR_direction(void);
-
 sint32 get_wheelRR_tick(void);
 
-
-
-void init_motorRR(void);
-void init_encoderRR(void);
 
 
 #endif /* DEVICEDRIVER_DRIVER_WHEELRR_H_ */

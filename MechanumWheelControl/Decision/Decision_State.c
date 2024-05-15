@@ -50,14 +50,11 @@ uint32 get_state(void)
 {
 
     /*ADC Test*/
-    get_adc_group0_raw();
-    get_adc_group2_raw();
+    JoystickValue move_raw   = get_joystick_rotate_value();
+    JoystickValue rotate_raw = get_joystick_move_value();
 
-    SensorAdcRaw* move_raw   = get_mid_adc_group2_raw();
-    SensorAdcRaw* rotate_raw = get_mid_adc_group0_raw();
-
-    g_move_x_val= move_raw->UlSSense1_Raw;
-    g_move_y_val= move_raw->UlSSense2_Raw;
+    g_move_x_val= move_raw.x;
+    g_move_y_val= move_raw.y;
 
     if(g_move_x_val <= 1570 && g_move_y_val <= 1570){
         s_state = 0;
@@ -84,8 +81,8 @@ uint32 get_state(void)
         s_state = 3;
     }
     else {
-        g_rotate_x_val= rotate_raw->UlSSense1_Raw;
-        g_rotate_y_val= rotate_raw->UlSSense2_Raw;
+        g_rotate_x_val= rotate_raw.x;
+        g_rotate_y_val= rotate_raw.y;
         if(g_rotate_x_val>=3350 && g_rotate_y_val<3350 &&g_rotate_y_val>=1570){
             s_state = 9;
         }
