@@ -98,7 +98,7 @@ void init_bluetooth(void) {
 void make_bluetooth_msg(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
     char message[USB_UART_MAX_PRINT_SIZE + 1];
 
-    snprintf(message, sizeof(message), "%u %u %u %u", x_mv, y_mv, x_rt, y_rt);
+    snprintf(message, sizeof(message), "%u %u %u %u\n", x_mv, y_mv, x_rt, y_rt);
 
     send_data(message);
 }

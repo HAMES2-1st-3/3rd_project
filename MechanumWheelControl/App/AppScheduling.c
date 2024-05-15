@@ -95,38 +95,18 @@ static void AppTask1ms(void)
 
 static void AppTask10ms(void)
 {
-//    g_sub_state = get_sub_state(); // 0: normal / 1: slow / 2: stop
+    JoystickValue move = get_joystick_move_value();
+    JoystickValue rotate = get_joystick_rotate_value();
+
+    make_bluetooth_msg(move.x, move.y, rotate.x, rotate.y);
+    _usb_printf("%u %u %u %u\n", move.x, move.y, rotate.x, rotate.y);
 }
 static void AppTask20ms(void)
 {
-    //g_rpm_ref = get_rpm_reference();
-
 
 }
 static void AppTask50ms(void)
 {
-    float32 poten = get_potentiometer_data(); // 100% ~ 0%
-    JoystickValue move = get_joystick_move_value(); // 100% ~ 0%
-    JoystickValue rotate = get_joystick_rotate_value(); // 100% ~ 0%
-
-    make_bluetooth_msg(move.x, move.y, rotate.x, rotate.y);
-
-
-    sint32 dist = get_tof_distance(); // mm value
-
-//    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
-//            poten,
-//            dist,
-//            JM.x,
-//            JM.y,
-//            JR.x,
-//            JR.y);
-
-    set_wheelFL_dutycycle(poten*2-100);
-    set_wheelFR_dutycycle(poten*2-100);
-    set_wheelRL_dutycycle(poten*2-100);
-    set_wheelRR_dutycycle(poten*2-100);
-
 }
 static void AppTask100ms(void)
 {
@@ -134,11 +114,11 @@ static void AppTask100ms(void)
 }
 static void AppTask250ms(void)
 {
-//    set_buzzer_toggle();
+
 }
 static void AppTask500ms(void)
 {
-//    toggle_buzzer();
+
 }
 static void AppNoTask()
 {

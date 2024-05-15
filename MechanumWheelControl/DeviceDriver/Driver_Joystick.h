@@ -59,6 +59,7 @@ typedef struct{ //���� ����
 typedef struct{ //센싱 변수
         uint32 x;
         uint32 y;
+        boolean sw;
 }JoystickValue;
 
 extern SensorAdcRaw g_adc0_raw; //���� ���� ����

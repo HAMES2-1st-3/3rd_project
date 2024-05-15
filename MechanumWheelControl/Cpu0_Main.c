@@ -63,17 +63,17 @@ void core0_main(void)
     init_appscheduling(); // for AppScheduling
 
     /* Initialize Device Driver */
-    init_tof();
-    init_potentiometer();
-    init_buzzer();
+//    init_tof();
+//    init_potentiometer();
+//    init_buzzer();
     init_joystick();
     init_usb();
     init_bluetooth();
-    init_bluetooth_master();
-    init_wheelFL();
-    init_wheelFR();
-    init_wheelRL();
-    init_wheelRR();
+//    init_bluetooth_master();
+//    init_wheelFL();
+//    init_wheelFR();
+//    init_wheelRL();
+//    init_wheelRR();
 
 
     while(1)
