@@ -32,5 +32,6 @@
 /*Global Function Prototype*/ 
 /***********************************************************************/
 void get_rpm_max(void);
-
+float32 get_rpm_reference(uint8 state);
+void get_distance(uint8 state);
 #endif /* DECISION_DECISION_RPM_H_ */
