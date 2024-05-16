@@ -47,7 +47,7 @@
 - 이슈 만들어서 Number 확인하고, 커밋할때 앞에다가 #이슈번호 붙혀서 커밋하기!!
 - 브랜치도 이슈 Number 따라서 만들기( ex. feature/7 )
 
-## :white_check_mark: Coding Naming Convention
+## :white_check_mark: Code Convention
 
 1. Type 선언시 `_t` 붙이지 않기, AURIX Ifx 제공 자료형 사용
     * ex) `uint32`(O), `uint32_t`(X), `int8`(X), `sint8`(O), `float32`(O), `int`(X), `double`(X), 
@@ -66,10 +66,23 @@
     typedef float               float32;
     typedef double              float64;
     ```
+2. 라이브러리내 global 변수 사용하지 않고 static 키워드를 사용하여 외부에서 getter 함수 통해 접근
+* ex) static JoystickValues s_joystick_values;
+    ```
+    JoystickValues get_bluetooth_joystick_values(void) {
+    return s_joystick_values;
+    }
+
+    ```
+   
+3. Funtion 네이밍 규칙: 수행동작_device이름_상세동작 
+* ex) send_usb_printf
+
+
 3. 지정자에 따라 접두어 붙이기
       * static : `s_varname`
       * extern : `g_varname`
       * pointer : `p_varname`
 
-4. 변수 네이밍 규칙 : Snake Case convention 적용 - 예) `rpm_ref`, `sub_state`
-5. 함수 네이밍 규칙 : Snake Case convention 적용 - 예) `get_state()`
+6. 변수 네이밍 규칙 : Snake Case convention 적용 - 예) `rpm_ref`, `sub_state`
+7. 함수 네이밍 규칙 : Snake Case convention 적용 - 예) `get_state()`
