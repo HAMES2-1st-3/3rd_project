@@ -27,6 +27,16 @@
 
 #ifndef DEVICEDRIVER_DRIVER_WHEELFR_H_
 #define DEVICEDRIVER_DRIVER_WHEELFR_H_
+/* Device Driver for wheelFR()
+ * 
+ * PWM channel          : P10_3,TOUT105 - GTM, TOM0, Channel3
+ * direction channel    : P10_2,GP_OUT
+ * encoder channel A    : P00_4,REQ7 -  ERS2, OGU1, Interrupt SRC_SCUERU1
+ * encoder channel B    : P00_5,GP_IN
+ * 
+ * duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002%
+ */
+
 
 /*********************************************************************************************************************/
 /*-----------------------------------------------------Includes------------------------------------------------------*/
@@ -54,14 +64,31 @@
 /*------------------------------------------------Function Prototypes------------------------------------------------*/
 /*********************************************************************************************************************/
 
+/* summary : initialize wheelFR(front right wheel) 
+ * argu     >   none
+ * return   >   none
+ */
 void init_wheelFR(void);
 
-/* duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002% */
+/* summary : set wheelFR PWM dutycycle
+ * argu     >   dutycycle:  dutycycle percentage, positive mean forward rotate
+ *                          negative mean back ward rotate
+ * return   >   none
+ */
 void set_wheelFR_dutycycle(float32 dutycycle); // dutycycle : 100f ~ -100f
 
-// 100% ~ -100%
+/* summary : get wheelFR PWM dutycycle
+ * argu     >   void
+ * return   >   (float32):  dutycycle percentage, positive mean forward rotate
+ *                          negative mean back ward rotate
+ */
 float32 get_wheelFR_dutycycle(void);
 
+/* summary : get wheelFR encoder ticks
+ * argu     >   void
+ * return   >   (sint32):   encoder tick, positive mean forward rotate dirction
+ *                          positive mean backward rotate dirction
+ */
 sint32 get_wheelFR_tick(void);
 
 

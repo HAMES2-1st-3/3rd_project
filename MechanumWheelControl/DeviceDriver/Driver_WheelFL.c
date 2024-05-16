@@ -29,6 +29,12 @@
 /*********************************************************************************************************************/
 /*-----------------------------------------------------Includes------------------------------------------------------*/
 /*********************************************************************************************************************/
+
+/* Wheel consist of motor and encoder. In the source code there are motor function 
+ * and encoder function. But to avoid confusion, library only provid the wheel API.
+ * 
+ */
+
 #include <Driver_WheelFL.h>
 #include <InterruptPriority.h>
 #include <PortPinMapping.h>
@@ -42,10 +48,13 @@
 /*------------------------------------------------------Macros-------------------------------------------------------*/
 /*********************************************************************************************************************/
 
+/* 1 : motor CW rotatation(1) means wheel forward, 
+ * 0 : motor CCW rotatation(0) means wheel forward
+ */
+#define MOTOR_FORWARD_DIR 0  
 
-#define MOTOR_FORWARD_DIR 0  /* 1 : motor CW(1) -> wheel forward, 0 : motor CCW(0) -> wheel forward */
-
-#define PWM_PERIOD                  50000                                   /* PWM period for the TOM                       */
+/* GTM TOM(Timer Output Module) channel counter re-load value */
+#define PWM_PERIOD                  50000                             /* PWM period for the TOM                       */
 
 #define INTERRUPT_TRIGGER_CHANNEL   (IfxScuEru_InputNodePointer_0)    /* same with statement below  */
 #define OUTPUT_CHANNEL              (IfxScuEru_OutputChannel_0)       /* same with statement above  */
@@ -57,28 +66,27 @@
 /*********************************************************************************************************************/
 /*--------------------------------------------Private Variables/Constants--------------------------------------------*/
 /*********************************************************************************************************************/
-static IfxGtm_Tom_Pwm_Config s_tomConfig_motor;                                  /* Timer configuration structure                */
-static IfxGtm_Tom_Pwm_Driver s_tomDriver_motor;
+static IfxGtm_Tom_Pwm_Config s_tomConfig_motor;                         /* Timer configuration structure */
+static IfxGtm_Tom_Pwm_Driver s_tomDriver_motor;                         /* GTM TOM driver configuration structure */
 
 
-static sint32 s_encoder_data = 0;  // 48 per rotate
+static sint32 s_encoder_data = 0;           /* 22 ticks per motor rotate, 660 ticks per wheel rotate */
 
 
 /*********************************************************************************************************************/
 /*------------------------------------------------Function Prototypes------------------------------------------------*/
 /*********************************************************************************************************************/
 
-static void init_motorFL(void);
-static inline void set_motorFL_dutycycle(float32 dutycycle); // dutycycle : 100f ~ 0f
-static inline void set_motorFL_direction(boolean clock_wise); // 1 : CW, 0: CCW
+static void init_motorFL(void);                                 // initialize TOM module and motor device 
+static inline void set_motorFL_dutycycle(float32 dutycycle);    // dutycycle - 0f ~ 100f, motor PWM dutycycle
+static inline void set_motorFL_direction(boolean clock_wise);   // clock_wise - 1 : CW rotate, 1 : CCW rotate 
 
-// 0% ~ 100%
-static inline float32 get_motorFL_dutycycle(void);
-// 1 : CW, 0 : CCW
-static inline boolean get_motorFL_direction(void);
 
-static void init_encoderFL(void);
-static inline sint32 get_encoderFL_tick(void);
+static inline float32 get_motorFL_dutycycle(void);              // return - 0f ~ 100f, motor PWM dutycycle
+static inline boolean get_motorFL_direction(void);              // return - 1 : CW rotate, 1 : CCW rotate 
+
+static void init_encoderFL(void);                               // initialize interrupt SCUERU and motor device 
+static inline sint32 get_encoderFL_tick(void);                  // return s_encoder_data, encoder ticks
 
 
 /*********************************************************************************************************************/
@@ -88,7 +96,7 @@ static inline sint32 get_encoderFL_tick(void);
 
 /* when looking at the motor shaft above,
  * The clockwise motion of the motor is positive quantity.
- * motor use 'CW', 'CCW' to refer direction.
+ * motor use 'CW(Clock Wise)', 'CCW(Count Clock Wise)' to refer direction.
  *      motor CW : positive, motor CCW ; negative
  *
  * while, wheel use 'forward' and 'backward'.
@@ -104,8 +112,7 @@ void init_wheelFL(void){
 }
 
 
-/* duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002% */
-void set_wheelFL_dutycycle(float32 dutycycle) { // dutycycle : 100f ~ -100f
+void set_wheelFL_dutycycle(float32 dutycycle) { 
 #if MOTOR_FORWARD_DIR == 1
     if(dutycycle >= 0) {
         set_motorFL_direction(1);
@@ -125,7 +132,6 @@ void set_wheelFL_dutycycle(float32 dutycycle) { // dutycycle : 100f ~ -100f
 #endif
 }
 
-// 100% ~ -100%
 float32 get_wheelFL_dutycycle(void) {
 #if MOTOR_FORWARD_DIR == 1
     if(get_motorFL_direction() == 1) {
@@ -162,52 +168,49 @@ static void init_motorFL(void) {
     IfxPort_setPinMode(_P_MOTORFL_DIR, IfxPort_Mode_outputPushPullGeneral);
 
     /*============= init Gtm_Tom0_CH9_TOUT1, P02_1 ==============*/
-    IfxGtm_enable(&MODULE_GTM);                                     /* Enable GTM                                   */
+    IfxGtm_enable(&MODULE_GTM);                                             /* Enable GTM                                   */
 
-    IfxGtm_Cmu_enableClocks(&MODULE_GTM, IFXGTM_CMU_CLKEN_FXCLK);   /* Enable the FXU clock                         */
+    IfxGtm_Cmu_enableClocks(&MODULE_GTM, IFXGTM_CMU_CLKEN_FXCLK);           /* Enable the FXU clock                         */
 
-    /* Initialize the configuration structure with default parameters */
-    IfxGtm_Tom_Pwm_initConfig(&s_tomConfig_motor, &MODULE_GTM);
+    IfxGtm_Tom_Pwm_initConfig(&s_tomConfig_motor, &MODULE_GTM);             /* Initialize the configuration structure with default parameters */
 
-    s_tomConfig_motor.tom = _M_MOTORFL_PWM_TOUTMAP.tom;                                      /* Select the TOM depending on the LED_PWM          */
-    s_tomConfig_motor.tomChannel = _M_MOTORFL_PWM_TOUTMAP.channel;                           /* Select the channel depending on the LED_PWM      */
-    s_tomConfig_motor.period = PWM_PERIOD;                                /* Set the timer period                         */
-    s_tomConfig_motor.pin.outputPin = &_M_MOTORFL_PWM_TOUTMAP;                               /* Set the LED_PWM port pin as output               */
-    s_tomConfig_motor.synchronousUpdateEnabled = TRUE;                    /* Enable synchronous update                    */
+    s_tomConfig_motor.tom = _M_MOTORFL_PWM_TOUTMAP.tom;                     /* Select the TOM depending on the LED_PWM      */
+    s_tomConfig_motor.tomChannel = _M_MOTORFL_PWM_TOUTMAP.channel;          /* Select the channel depending on the LED_PWM  */
+    s_tomConfig_motor.period = PWM_PERIOD;                                  /* Set the timer period                         */
+    s_tomConfig_motor.pin.outputPin = &_M_MOTORFL_PWM_TOUTMAP;              /* Set the LED_PWM port pin as output           */
+    s_tomConfig_motor.synchronousUpdateEnabled = TRUE;                      /* Enable synchronous update                    */
 
-    IfxGtm_Tom_Pwm_init(&s_tomDriver_motor, &s_tomConfig_motor);                /* Initialize the GTM TOM                       */
-    IfxGtm_Tom_Pwm_start(&s_tomDriver_motor, TRUE);                       /* Start the PWM                                */
+    IfxGtm_Tom_Pwm_init(&s_tomDriver_motor, &s_tomConfig_motor);            /* Initialize the GTM TOM                       */
+    IfxGtm_Tom_Pwm_start(&s_tomDriver_motor, TRUE);                         /* Start the PWM                                */
 
-
-    set_motorFL_dutycycle(0);
-    set_motorFL_direction(TRUE);
+    // motor initially stop
+    set_motorFL_dutycycle(0);                                               
+    set_motorFL_direction(TRUE);                                            
 }
 
 
-static inline void set_motorFL_dutycycle(float32 dutycycle){ // 0% ~ 100%
-    s_tomConfig_motor.dutyCycle = (uint16) (dutycycle / 100 * PWM_PERIOD);                 /* Change the value of the duty cycle           */
-    IfxGtm_Tom_Pwm_init(&s_tomDriver_motor, &s_tomConfig_motor);
+static inline void set_motorFL_dutycycle(float32 dutycycle){ 
+    s_tomConfig_motor.dutyCycle = (uint16) (dutycycle / 100 * PWM_PERIOD);  /* Change the value of the duty cycle           */                
+    IfxGtm_Tom_Pwm_init(&s_tomDriver_motor, &s_tomConfig_motor);            /* Re-initialize the GTM TOM                    */
 }
 
-static inline void set_motorFL_direction(boolean clock_wise){ // 1 : CW, 0: CCW
+static inline void set_motorFL_direction(boolean clock_wise){ 
     if(clock_wise == TRUE)
     {
-        IfxPort_setPinState(_P_MOTORFL_DIR, IfxPort_State_low);
+        IfxPort_setPinState(_P_MOTORFL_DIR, IfxPort_State_low);             /* set direction pin low to rotate CW           */
     }
     else
     {
-        IfxPort_setPinState(_P_MOTORFL_DIR, IfxPort_State_high);
+        IfxPort_setPinState(_P_MOTORFL_DIR, IfxPort_State_high);            /* set direction pin high to rotate CCW         */
     }
 }
 
-// 0% ~ 100%
 static inline float32 get_motorFL_dutycycle(void) {
-    return (float32)(s_tomConfig_motor.dutyCycle) * 100 / PWM_PERIOD;
+    return (float32)(s_tomConfig_motor.dutyCycle) * 100 / PWM_PERIOD;       /* get motor PWM dutucycle                      */
 }
 
-// 1 : CW, 0 : CCW
-static inline boolean get_motorFL_direction(void){
-    return IfxPort_getPinState(_P_MOTORFL_PWM);
+static inline boolean get_motorFL_direction(void){                          
+    return IfxPort_getPinState(_P_MOTORFL_PWM);                             /* get direction pin state                      */
 }
 
 
@@ -219,9 +222,9 @@ IFX_INTERRUPT(encoderFL_chA_ISR, 0, ISR_PRIORITY_SCUERU0);
 void encoderFL_chA_ISR(void){
     if(IfxPort_getPinState(_P_ENCODERFL_CHA)) { // rising edge triggered
         if(IfxPort_getPinState(_P_ENCODERFL_CHB)) {
-            s_encoder_data--;
+            s_encoder_data--;                                               /* when motor rotate CCW, encoder tick decrease */
         } else {
-            s_encoder_data++;
+            s_encoder_data++;                                               /* when motor rotate CW, encoder tick increase  */
         }
     } else { // falling edge triggered
         if(IfxPort_getPinState(_P_ENCODERFL_CHB)) {
@@ -238,14 +241,14 @@ static void init_encoderFL(void) {
 
     /*======= init P14_1, ERU input Ch3, ERU output Ch0, SRC_SCU_SCU_ERU0 interrupt =======*/
     /* input multiplexers of the ERU, ERS configuration */
-    IfxScuEru_initReqPin(&_M_ENCODERFL_CHA_REQ_IN, IfxPort_InputMode_pullDown);     /* Initialize this pin with pull-down enabled */
+    IfxScuEru_initReqPin(&_M_ENCODERFL_CHA_REQ_IN, IfxPort_InputMode_pullDown);         /* Initialize this pin with pull-down enabled */
 
     /* Input channel, ETL configuration */
     IfxScuEru_InputChannel input_channel;
-    input_channel = (IfxScuEru_InputChannel)_M_ENCODERFL_CHA_REQ_IN.channelId;   /* Determine input channel depending on input pin */
-    IfxScuEru_enableRisingEdgeDetection(input_channel);     /* Interrupt triggers on rising edge (Register RENx) and  */
-    IfxScuEru_enableFallingEdgeDetection(input_channel);    /* on falling edge (Register FENx)  */
-    IfxScuEru_enableTriggerPulse(input_channel);            /* Enable generation of trigger event (Register EIENx) */
+    input_channel = (IfxScuEru_InputChannel)_M_ENCODERFL_CHA_REQ_IN.channelId;          /* Determine input channel depending on input pin */
+    IfxScuEru_enableRisingEdgeDetection(input_channel);                                 /* Interrupt triggers on rising edge (Register RENx) and  */
+    IfxScuEru_enableFallingEdgeDetection(input_channel);                                /* on falling edge (Register FENx)  */
+    IfxScuEru_enableTriggerPulse(input_channel);                                        /* Enable generation of trigger event (Register EIENx) */
 
     /* Connecting Matrix, Event Trigger Logic ETL block */
     /* Determination of output channel for trigger event (Register INPx) */

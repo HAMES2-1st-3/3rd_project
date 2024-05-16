@@ -27,6 +27,16 @@
 
 #ifndef DEVICEDRIVER_DRIVER_WHEELFL_H_
 #define DEVICEDRIVER_DRIVER_WHEELFL_H_
+/* Device Driver for wheelFL()
+ * 
+ * PWM channel          : P02_1,TOUT1 - GTM, TOM0, Channel9
+ * direction channel    : P10_1,GP_OUT
+ * encoder channel A    : P14_1,REQ15 -  ERS3, OGU0, Interrupt SRC_SCUERU0
+ * encoder channel B    : P00_0,GP_IN
+ * 
+ * duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002%
+ */
+
 
 /*********************************************************************************************************************/
 /*-----------------------------------------------------Includes------------------------------------------------------*/
@@ -36,9 +46,6 @@
 /*********************************************************************************************************************/
 /*------------------------------------------------------Macros-------------------------------------------------------*/
 /*********************************************************************************************************************/
-
-
-
 
 /*********************************************************************************************************************/
 /*-------------------------------------------------Global variables--------------------------------------------------*/
@@ -56,14 +63,34 @@
 /*------------------------------------------------Function Prototypes------------------------------------------------*/
 /*********************************************************************************************************************/
 
+/* summary : initialize wheelFL(front left wheel) 
+ * argu     >   none
+ * return   >   none
+ */
 void init_wheelFL(void);
 
-/* duty cycle resolution : 1/50000(PWM_PERIOD) = 0.002% */
+
+/* summary : set wheelFL PWM dutycycle
+ * argu     >   dutycycle:  dutycycle percentage, positive mean forward rotate
+ *                          negative mean back ward rotate
+ * return   >   none
+ */
 void set_wheelFL_dutycycle(float32 dutycycle); // dutycycle : 100f ~ -100f
 
-// 100% ~ -100%
+
+/* summary : get wheelFL PWM dutycycle
+ * argu     >   void
+ * return   >   (float32):  dutycycle percentage, positive mean forward rotate
+ *                          negative mean back ward rotate
+ */
 float32 get_wheelFL_dutycycle(void);
 
+
+/* summary : get wheelFL encoder ticks
+ * argu     >   void
+ * return   >   (sint32):   encoder tick, positive mean forward rotate dirction
+ *                          positive mean backward rotate dirction
+ */
 sint32 get_wheelFL_tick(void);
 
 

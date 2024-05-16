@@ -40,7 +40,17 @@
 /***********************************************************************/
 
 
+/* summary : initialize tof sensor, it communication using ASCLIN1(UART)
+ * argu     >   none
+ * return   >   none
+ */
 void init_tof(void);
+
+/* summary : initialize tof sensor, it communication using ASCLIN1(UART)
+ * argu     >   none
+ * return   >   (sint32)    : give disttance in mm(millimeter)
+ *                            negative value indicate error   
+ */
 sint32 get_tof_distance(void);
 
 

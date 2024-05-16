@@ -134,10 +134,10 @@ WheelDutycycles pid_controller(WheelRPMs wheel_rpms_error) {
 WheelDutycycles open_loop_controller(WheelRPMs wheel_rpms) {
     WheelDutycycles result;
 
-    result.fl = wheel_rpms.fl * 100 / MAX_RPM;
-    result.fr = wheel_rpms.fr * 100 / MAX_RPM;
-    result.rl = wheel_rpms.rl * 100 / MAX_RPM;
-    result.rr = wheel_rpms.rr * 100 / MAX_RPM;
+    result.fl = wheel_rpms.fl * 150 / MAX_RPM;
+    result.fr = wheel_rpms.fr * 150 / MAX_RPM;
+    result.rl = wheel_rpms.rl * 150 / MAX_RPM;
+    result.rr = wheel_rpms.rr * 150 / MAX_RPM;
 
     return result;
 }
@@ -155,28 +155,34 @@ void set_wheels_dutycycle(WheelDutycycles wheel_dutycycles) {
 WheelRPMs calc_wheel_rpms_ref(uint32 rpm_max, JoystickValues joystick_values) {
     WheelRPMs result_rpm;
 
-    float32 mov_x = (float32)(joystick_values.move.x - JOYSTICK_MAX_VALUE/2);
-    float32 mov_y = (float32)((JOYSTICK_MAX_VALUE - joystick_values.move.y) - JOYSTICK_MAX_VALUE/2);
+    float32 mov_x = ((float32)(joystick_values.move.x) - (float32)(JOYSTICK_MAX_VALUE/2));
+    float32 mov_y = (((float32)JOYSTICK_MAX_VALUE - (float32)(joystick_values.move.y)) - (float32)(JOYSTICK_MAX_VALUE/2));
 
+
+//    send_usb_printf("f : A: %f B:%f \n",
+//            (float32)mov_x,
+//            (float32)mov_y);
 #define JOYSTICK_ROTATE_COMPENSATE 1
 #if JOYSTICK_ROTATE_COMPENSATE == 1
-    float32 rot_x = (float32)(joystick_values.rotate.x - JOYSTICK_MAX_VALUE/2);
-    float32 rot_y = (float32)((JOYSTICK_MAX_VALUE - joystick_values.rotate.y) - JOYSTICK_MAX_VALUE/2);
+    float32 rot_x = ((float32)(joystick_values.rotate.x) - (float32)(JOYSTICK_MAX_VALUE/2));
+    float32 rot_y = (((float32)(JOYSTICK_MAX_VALUE) - (float32)(joystick_values.rotate.y)) - (float32)(JOYSTICK_MAX_VALUE/2));
 #else
     sint32 rot_x = (float32)((JOYSTICK_MAX_VALUE - joystick_values.rotate.x) - JOYSTICK_MAX_VALUE/2);
     sint32 rot_y = (float32)(joystick_values.rotate.y - JOYSTICK_MAX_VALUE/2);
 #endif
+
+//    send_usb_printf("f : A: %f B: %f C: %f D: %f\n",
+//            mov_x,
+//            mov_y,
+//            rot_x,
+//            rot_y);
 
     mov_x = mov_x / (JOYSTICK_MAX_VALUE/2);
     mov_y = mov_y / (JOYSTICK_MAX_VALUE/2);
     rot_x = rot_x / (JOYSTICK_MAX_VALUE/2);
     rot_y = rot_y / (JOYSTICK_MAX_VALUE/2);
 
-    send_usb_printf("A: %f B: %f C: %f D: %f\n",
-            mov_x,
-            mov_y,
-            rot_x,
-            rot_y);
+
 
 
     float32 gain = 0;
@@ -205,6 +211,9 @@ WheelRPMs calc_wheel_rpms_ref(uint32 rpm_max, JoystickValues joystick_values) {
             gain = (2/(-mov_y+1))*(mov_x);
         }
     }
+
+//        send_usb_printf("s : A: %f\n",
+//                gain);
 
     mov_x = gain * mov_x;
     mov_y = gain * mov_y;

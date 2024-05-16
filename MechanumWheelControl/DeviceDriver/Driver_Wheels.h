@@ -53,7 +53,7 @@
 /*-------------------------------------------------Data Structures---------------------------------------------------*/
 /*********************************************************************************************************************/
  
-typedef struct{ //value of reference RPM for each wheels
+typedef struct{ //value of encoder ticks for each wheels
         sint32 fl;
         sint32 fr;
         sint32 rr;
@@ -67,7 +67,7 @@ typedef struct{ //value of reference RPM for each wheels
         float32 rl;
 }WheelRPMs;
 
-typedef struct{ //value of reference RPM for each wheels
+typedef struct{ //value of set dutycycle for each wheels
         float32 fl;
         float32 fr;
         float32 rr;

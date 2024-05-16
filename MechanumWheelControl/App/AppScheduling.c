@@ -130,7 +130,11 @@ static void AppTask10ms(void)
 static void AppTask20ms(void)
 {
     /* set wheel rpm reference */
-    s_joystick_values = get_bluetooth_joystick_values();
+    JoystickValue temp = get_joystick_move_value();
+    s_joystick_values.move.x = temp.x;
+    s_joystick_values.move.y = temp.y;
+
+//    s_joystick_values = get_bluetooth_joystick_values();
     s_wheel_rpms_ref = calc_wheel_rpms_ref(s_rpm_max, s_joystick_values);
 
 }
@@ -144,24 +148,24 @@ static void AppTask50ms(void)
 //            s_joystick_values.rotate.y);
 
 //    send_usb_printf("rpm_fl: %f\n", s_wheel_rpms_ref.fl);
-//    send_usb_printf("rpm_fl: %f rpm_fr: %f rpm_rl: %f rpm_rr: %f\n",
+//    send_usb_printf("rpm_fl: %.2f rpm_fr: %.2f rpm_rl: %.2f rpm_rr: %.2f\n",
 //            s_wheel_rpms_ref.fl,
 //            s_wheel_rpms_ref.rl,
 //            s_wheel_rpms_ref.fr,
 //            s_wheel_rpms_ref.rr);
 
-//    send_usb_printf("duty_fl: %f duty_fr: %f duty_rl: %f duty_rr: %f\n",
-//            s_wheel_dutycycles.fl,
-//            s_wheel_dutycycles.rl,
-//            s_wheel_dutycycles.fr,
-//            s_wheel_dutycycles.rr);
+    send_usb_printf("duty_fl: %.2f duty_fr: %.2f duty_rl: %.2f duty_rr: %.2f\n",
+            s_wheel_dutycycles.fl,
+            s_wheel_dutycycles.rl,
+            s_wheel_dutycycles.fr,
+            s_wheel_dutycycles.rr);
 
 
 
     /* set rpm_max */
     s_dist = get_tof_distance();
     s_rpm_max = get_potentiometer_value(); // 0 ~ 4095
-    s_rpm_max = get_max_rpm(s_dist, s_rpm_max);
+//    s_rpm_max = get_max_rpm(s_dist, s_rpm_max);
 
     s_buzzer_state = set_buzzer_state(s_dist);
     set_buzzer_mode_on_off(s_buzzer_state);

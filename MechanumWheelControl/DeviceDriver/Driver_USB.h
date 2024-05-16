@@ -30,7 +30,17 @@
 /***********************************************************************/
 /*Global Function Prototype*/
 /***********************************************************************/
+
+/* summary : initialize USB communication port(UART) with PC
+ * argu     >   none
+ * return   >   none
+ */
 void init_usb(void);
+
+/* summary : send format string message to PC 
+ * argu     >   format: format string  
+ * return   >   none
+ */
 void send_usb_printf(pchar format,...);
 
 

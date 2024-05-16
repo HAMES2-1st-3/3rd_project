@@ -29,20 +29,36 @@
 /*Global Function Prototype*/ 
 /***********************************************************************/
 
-/*
- * in 'init_buzzer()', it 'use set_buzzer_intensity(50)'
- * if you want to use buzzer, you just use 'init_buzzer()' in main()
+/* summary : initialize buzzer device with TOM0_11_TOUT3, P02_3
+ *           in 'init_buzzer()', it 'use set_buzzer_intensity(50)'
+ * argu     >   none
+ * return   >   none
  */
-void init_buzzer(void);                         /* initialize buzzer */
+void init_buzzer(void);                         
 
-/*
- * if you want to set other buzzer intensity
- * set intensity 100~0
+/* summary : set buzzer intensity 100~0, 
+ * argu     >   intensity   : this configurate dutycycle of PWM
+ * return   >   none   
  */
 void set_buzzer_intensity(float32 intensity);
 
+
+/* summary : toggle buzzer with certain intensity
+ * argu     >   none
+ * return   >   none   
+ */
 void set_buzzer_toggle(void);
+
+/* summary : off the buzzer sound
+ * argu     >   none
+ * return   >   none   
+ */
 void set_buzzer_off(void);
+
+/* summary : on the buzzer sound with certain intensity
+ * argu     >   none
+ * return   >   none   
+ */
 void set_buzzer_on(void);
                            /* Function to set the duty cycle of the PWM    */
 #endif /* DEVICEDRIVER_DRIVER_BUZZER_H_ */

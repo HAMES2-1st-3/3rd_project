@@ -45,12 +45,13 @@ typedef enum{
     ADC_GROUP2_MAX
 }ADC_GROUP2;
 
-
+// joystick x, y value
 typedef struct{ //센싱 변수
         uint32 x;
         uint32 y;
 }JoystickValue;
 
+// all joystick value set
 typedef struct{
         JoystickValue move;
         JoystickValue rotate;
@@ -60,7 +61,7 @@ typedef struct{
 /***********************************************************************/
 /*Define*/
 /***********************************************************************/
-#define JOYSTICK_MAX_VALUE 4095
+#define JOYSTICK_MAX_VALUE 4095 // 12bit VADC max value
 
 /***********************************************************************/
 /*External Variable*/
@@ -72,8 +73,23 @@ typedef struct{
 /*Global Function Prototype*/
 /***********************************************************************/
 
+/* summary : initialize potentiometer with VADC group0 channel3,2 
+             and group2 channel5,4
+ * argu     >   none
+ * return   >   none
+ */
 void init_joystick(void);
+
+/* summary : get move joystick value
+ * argu     >   none
+ * return   >   (JoystickValue) : two uint32 value within 0 ~ 4095 ADC value
+ */
 JoystickValue get_joystick_move_value(void);
+
+/* summary : get rotate joystick value
+ * argu     >   none
+ * return   >   (JoystickValue) : two uint32 value within 0 ~ 4095 ADC value
+ */
 JoystickValue get_joystick_rotate_value(void);
 
 #endif /* DRIVER_JOYSTICK */
