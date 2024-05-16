@@ -28,7 +28,6 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
-#include <Driver_USB.h>
 #include <Driver_Bluetooth.h>
 #include <AppScheduling_cpu1.h>
 
@@ -46,6 +45,7 @@ int core1_main(void)
     /* Wait for CPU sync event */
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
+
     init_appscheduling_cpu1();
     init_bluetooth();
 

@@ -3,16 +3,16 @@
  *
  *  Created on: 2024. 5. 10.
  *      Author: jaeeun
- *  í•„ìš” í•¨ìˆ˜ ë° ê¸°ëŠ¥
+ *  ÇÊ¿ä ÇÔ¼ö ¹× ±â´É
  *    int32 FUNC();
- *     - ToFì„¼ì„œë¥¼ í†µí•´ ê±°ë¦¬ê°’ì„ ìž…ë ¥ ë°›ì•„ sub_stateë¥¼ íŒë‹¨í•˜ì—¬ returní•¨
+ *     - ToF¼¾¼­¸¦ ÅëÇØ °Å¸®°ªÀ» ÀÔ·Â ¹Þ¾Æ sub_state¸¦ ÆÇ´ÜÇÏ¿© returnÇÔ
  *     - sub_state: 0,1,2
- *     - distance ê°€ 50cm ì´ˆê³¼ì¼ ê²½ìš° normal(0)
- *     - distance ê°€ 10cm ì´ˆê³¼ && 50cm ì´í•˜ì¼ ê²½ìš° slow(1)
- *     - distance ê°€ 10cm ì´í•˜ì¼ ê²½ìš° stop(2)
- *     - distance ê°€ ìŒìˆ˜ì™€ ê°™ì€ ì—ëŸ¬ê°’ì¼ ê²½ìš° ì´ì „ì˜ sub_state ë¦¬í„´
+ *     - distance °¡ 50cm ÃÊ°úÀÏ °æ¿ì normal(0)
+ *     - distance °¡ 10cm ÃÊ°ú && 50cm ÀÌÇÏÀÏ °æ¿ì slow(1)
+ *     - distance °¡ 10cm ÀÌÇÏÀÏ °æ¿ì stop(2)
+ *     - distance °¡ À½¼ö¿Í °°Àº ¿¡·¯°ªÀÏ °æ¿ì ÀÌÀüÀÇ sub_state ¸®ÅÏ
  *
- *     -> Driver_ToF.h ì‚¬ìš©
+ *     -> Driver_ToF.h »ç¿ë
  */
 
 #ifndef DECISION_DECISION_SUB_STATE_H_

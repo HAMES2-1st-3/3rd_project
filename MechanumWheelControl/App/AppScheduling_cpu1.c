@@ -67,7 +67,7 @@ uint32 g_counter_1_1ms = 0u;
 
 static void AppTask1ms(void)
 {
-    receive_bluetooth_joystick_data();
+    receive_bluetooth_joystick_values();
 }
 
 static void AppTask10ms(void)

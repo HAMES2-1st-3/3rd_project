@@ -4,33 +4,33 @@
 #include <AppMode.h>
 #include <AppScheduling.h>
 
+#include <InterruptPriority.h>
 
 #include "IfxStm.h"
 #include "IfxCpu_Irq.h"
 
+#include <Driver_Wheels.h>
+
 /********** control, Decision **********/
 #include <Control_Buzzer.h>
-#include <Control_Motor.h>
+#include <Control_Wheels.h>
 
-#include <Decision_RPM.h>
-#include <Decision_State.h>
-#include <Decision_Sub_State.h>
+//#include <Decision_RPM.h>
+//#include <Decision_State.h>
+//#include <Decision_Sub_State.h>
 /***************************************/
 
-/*******for test DD header files********/
-#include <Driver_Joystick.h>
-#include <Driver_Potentiometer.h>
-#include <Driver_ToF.h>
-#include <Driver_USB.h>
-#include <Driver_Bluetooth.h>
-
-#include <Driver_Buzzer.h>
-#include <Driver_WheelFL.h>
-#include <Driver_WheelFR.h>
-#include <Driver_WheelRL.h>
-#include <Driver_WheelRR.h>
-#include <InterruptPriority.h>
-/***************************************/
+///*******for test DD header files********/
+//#include <Driver_Joystick.h>
+//#include <Driver_Potentiometer.h>
+//#include <Driver_ToF.h>
+//#include <Driver_USB.h>
+//#include <Driver_Bluetooth.h>
+//
+//#include <Driver_Buzzer.h>
+//
+//
+///***************************************/
 
 
 /***********************************************************************/
@@ -81,8 +81,19 @@ uint32 g_counter_1ms = 0u;
 /***********************************************************************/
 /*User Variable*/
 /***********************************************************************/
-uint8 g_sub_state;
-uint32 g_rpm_ref;
+
+sint32 s_dist;
+uint32 s_rpm_max;
+
+WheelRPMs s_wheel_rpms_ref;
+JoystickValues s_joystick_values;
+
+WheelTicks s_wheel_ticks;
+WheelRPMs s_wheel_rpms_measured;
+WheelRPMs s_wheel_rpms_error;
+WheelDutycycles s_wheel_dutycycles;
+
+BuzzerState s_buzzer_state;
 
 /***********************************************************************/
 /*Function*/ 
@@ -90,7 +101,11 @@ uint32 g_rpm_ref;
 
 static void AppTask1ms(void)
 {
-
+    /* set wheel rpm measured, error, pid controll */
+    s_wheel_ticks = get_wheel_ticks();
+    s_wheel_rpms_measured = calc_wheel_rpms_measured(s_wheel_ticks, 0.001);
+    s_wheel_rpms_error = calc_wheel_rpms_error(s_wheel_rpms_ref, s_wheel_rpms_measured);
+    s_wheel_dutycycles = pid_controller(s_wheel_rpms_error);
 }
 
 static void AppTask10ms(void)
@@ -99,19 +114,27 @@ static void AppTask10ms(void)
 }
 static void AppTask20ms(void)
 {
+    /* set wheel rpm reference */
+    s_joystick_values = get_bluetooth_joystick_values();
+    s_wheel_rpms_ref = calc_wheel_rpms_ref(s_rpm_max, s_joystick_values);
 
 }
 static void AppTask50ms(void)
 {
-//    JoystickValueForBT values = receive_data();
-//    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n", values.move_x, values.move_y, values.rotate_x, values.rotate_y);
+//    JoystickValues joystick_values = get_bluetooth_joystick_values();
+//    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
+//            joystick_values.move.x,
+//            joystick_values.move.y,
+//            joystick_values.rotate.x,
+//            joystick_values.rotate.y);
 
-    JoystickValueSet joystick_data = get_bluetooth_joystick_data();
-    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
-            joystick_data.move.x,
-            joystick_data.move.y,
-            joystick_data.rotate.x,
-            joystick_data.rotate.y);
+    /* set rpm_max */
+    s_dist = get_tof_distance();
+    s_rpm_max = get_potentialmeter_value();
+    s_rpm_max = get_max_rpm(s_dist, s_rpm_max);
+
+    s_buzzer_state = set_buzzer_state(s_dist);
+    set_buzzer_mode_on_off(s_buzzer_state);
 }
 static void AppTask100ms(void)
 {
@@ -119,11 +142,11 @@ static void AppTask100ms(void)
 }
 static void AppTask250ms(void)
 {
-
+    set_buzzer_mode_250ms(s_buzzer_state);
 }
 static void AppTask500ms(void)
 {
-//    toggle_buzzer();
+    set_buzzer_mode_500ms(s_buzzer_state);
 }
 static void AppNoTask()
 {

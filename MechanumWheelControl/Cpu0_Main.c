@@ -35,13 +35,9 @@
 #include <Driver_Bluetooth.h>
 
 #include <Driver_Buzzer.h>
-#include <Driver_WheelFL.h>
-#include <Driver_WheelFR.h>
-#include <Driver_WheelRL.h>
-#include <Driver_WheelRR.h>
+#include <Driver_Wheels.h>
 
 #include <AppScheduling.h>
-
 
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
@@ -70,8 +66,6 @@ void core0_main(void)
     init_joystick();
     init_usb();
 
-//    init_bluetooth();
-
     init_wheelFL();
     init_wheelFR();
     init_wheelRL();
@@ -80,8 +74,5 @@ void core0_main(void)
     while(1)
     {
         AppScheduling();
-//        JoystickValueForBT values = receive_data();
-
-
     }
 }

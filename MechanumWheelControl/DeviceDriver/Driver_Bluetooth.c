@@ -53,7 +53,7 @@ static uint8 s_asclin2_tx_buf[ASC2_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 static uint8 s_asclin2_rx_buf[ASC2_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 
 
-JoystickValueSet s_joystick_values;
+JoystickValues s_joystick_values;
 
 
 /*------------------------------------------------------Macros-------------------------------------------------------*/
@@ -116,7 +116,7 @@ void init_bluetooth(void) {
 }
 
 
-void send_bluetooth_joystick_data(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
+void send_bluetooth_joystick_values(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
     char message[USB_UART_MAX_PRINT_SIZE + 1];
 
     snprintf(message, sizeof(message), "%lu %lu %lu %lu", x_mv, y_mv, x_rt, y_rt);
@@ -125,7 +125,7 @@ void send_bluetooth_joystick_data(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 
 }
 
 
-void receive_bluetooth_joystick_data(void) {
+void receive_bluetooth_joystick_values(void) {
     char buffer[USB_UART_MAX_PRINT_SIZE + 1];
     Ifx_SizeT count = 0;
     char ch;
@@ -141,13 +141,13 @@ void receive_bluetooth_joystick_data(void) {
     buffer[count] = '\0'; // Null-terminate the string
 
     // Parse the received string into the JoystickValue structure
-    JoystickValueSet joystick;
+    JoystickValues joystick;
     if (sscanf(buffer, "%lu %lu %lu %lu", &joystick.move.x, &joystick.move.y, &joystick.rotate.x, &joystick.rotate.y) == 4) {
         s_joystick_values = joystick; // Update the global joystick value
     }
 }
 
-JoystickValueSet get_bluetooth_joystick_data(void) {
+JoystickValues get_bluetooth_joystick_values(void) {
     return s_joystick_values;
 }
 

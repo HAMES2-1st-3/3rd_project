@@ -54,7 +54,7 @@ typedef struct{ //센싱 변수
 typedef struct{
         JoystickValue move;
         JoystickValue rotate;
-}JoystickValueSet;
+}JoystickValues;
 
 
 /***********************************************************************/

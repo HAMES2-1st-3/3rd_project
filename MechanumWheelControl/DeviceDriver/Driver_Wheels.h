@@ -1,5 +1,5 @@
 /**********************************************************************************************************************
- * \file System_Property.h
+ * \file Driver_wheels.h
  * \copyright Copyright (C) Infineon Technologies AG 2019
  * 
  * Use of this file is subject to the terms of use agreed between (i) you or the company in which ordinary course of 
@@ -25,12 +25,17 @@
  * IN THE SOFTWARE.
  *********************************************************************************************************************/
 
-#ifndef DEVICEDRIVER_WHEEL_PROPERTY_H_
-#define DEVICEDRIVER_WHEEL_PROPERTY_H_
+#ifndef DEVICEDRIVER_DRIVER_WHEELS_H_
+#define DEVICEDRIVER_DRIVER_WHEELS_H_
 
 /*********************************************************************************************************************/
 /*-----------------------------------------------------Includes------------------------------------------------------*/
 /*********************************************************************************************************************/
+#include <Driver_WheelFL.h>
+#include <Driver_WheelFR.h>
+#include <Driver_WheelRL.h>
+#include <Driver_WheelRR.h>
+
 
 /*********************************************************************************************************************/
 /*------------------------------------------------------Macros-------------------------------------------------------*/
@@ -48,6 +53,27 @@
 /*-------------------------------------------------Data Structures---------------------------------------------------*/
 /*********************************************************************************************************************/
  
+typedef struct{ //value of reference RPM for each wheels
+        sint32 fl;
+        sint32 fr;
+        sint32 rr;
+        sint32 rl;
+}WheelTicks;
+
+typedef struct{ //value of reference RPM for each wheels
+        float32 fl;
+        float32 fr;
+        float32 rr;
+        float32 rl;
+}WheelRPMs;
+
+typedef struct{ //value of reference RPM for each wheels
+        float32 fl;
+        float32 fr;
+        float32 rr;
+        float32 rl;
+}WheelDutycycles;
+
 /*********************************************************************************************************************/
 /*--------------------------------------------Private Variables/Constants--------------------------------------------*/
 /*********************************************************************************************************************/
@@ -57,4 +83,4 @@
 /*********************************************************************************************************************/
 
 
-#endif /* DEVICEDRIVER_WHEEL_PROPERTY_H_ */
+#endif /* DEVICEDRIVER_DRIVER_WHEELS_H_ */

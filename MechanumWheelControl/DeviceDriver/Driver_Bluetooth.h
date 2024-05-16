@@ -33,9 +33,9 @@
 /***********************************************************************/
 void init_bluetooth(void);
 
-void send_bluetooth_joystick_data(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt);
-void receive_bluetooth_joystick_data(void);
-JoystickValueSet get_bluetooth_joystick_data(void);
+void send_bluetooth_joystick_values(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt);
+void receive_bluetooth_joystick_values(void);
+JoystickValues get_bluetooth_joystick_values(void);
 
 
 // config bluetooth function at AT command mode
