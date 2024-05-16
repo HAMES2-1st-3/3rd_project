@@ -59,8 +59,8 @@ static IfxGtm_Tom_Pwm_Config s_tomConfig_motor;                                 
 static IfxGtm_Tom_Pwm_Driver s_tomDriver_motor;
 
 
-static sint32 s_encoder_data = 0;  // 48 per rotate
-
+static float32 s_encoder_data = 0;  // 48 per rotate
+//static sint32 s_encoder_data = 0;  // 48 per rotate
 
 /*********************************************************************************************************************/
 /*------------------------------------------------Function Prototypes------------------------------------------------*/
@@ -205,8 +205,9 @@ static inline float32 get_motorRL_dutycycle(void) {
 }
 
 // 1 : CW, 0 : CCW
+// 1 : CW, 0 : CCW
 static inline boolean get_motorRL_direction(void){
-    return IfxPort_getPinState(_P_MOTORRL_PWM);
+    return IfxPort_getPinState(_P_MOTORRL_DIR);
 }
 
 
@@ -218,15 +219,17 @@ IFX_INTERRUPT(encoderRL_chA_ISR, 0, ISR_PRIORITY_SCUERU2);
 void encoderRL_chA_ISR(void){
     if(IfxPort_getPinState(_P_ENCODERRL_CHA)) { // rising edge triggered
         if(IfxPort_getPinState(_P_ENCODERRL_CHB)) {
-            s_encoder_data--;
+            s_encoder_data -= (75/57.0);
+            //s_encoder_data -=1;
         } else {
-            s_encoder_data++;
+            s_encoder_data += 1;
         }
     } else { // falling edge triggered
         if(IfxPort_getPinState(_P_ENCODERRL_CHB)) {
-            s_encoder_data++;
+            s_encoder_data += 1;
         } else {
-            s_encoder_data--;
+            s_encoder_data -= (75/57.0);
+            //s_encoder_data -= 1;
         }
     }
 }
@@ -263,6 +266,6 @@ static void init_encoderRL(void) {
 }
 
 static inline sint32 get_encoderRL_tick(void) {
-    return s_encoder_data;
+    return (sint32)s_encoder_data;
 }
 

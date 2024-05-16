@@ -266,4 +266,3 @@ static void init_encoderFL(void) {
 static inline sint32 get_encoderFL_tick(void) {
     return s_encoder_data;
 }
-

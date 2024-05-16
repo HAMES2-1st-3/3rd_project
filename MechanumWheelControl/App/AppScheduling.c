@@ -4,7 +4,6 @@
 #include <AppMode.h>
 #include <AppScheduling.h>
 
-
 #include "IfxStm.h"
 #include "IfxCpu_Irq.h"
 
@@ -81,30 +80,56 @@ uint32 g_counter_1ms = 0u;
 /***********************************************************************/
 /*User Variable*/
 /***********************************************************************/
+uint8 g_state;
 uint8 g_sub_state;
-uint32 g_rpm_ref;
-
+float32 g_rpm_ref;
+float32 theta_tilde;
+uint32  cnt;
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
 
 static void AppTask1ms(void)
 {
-
+    cnt++;
+    set_all_wheel(g_state, g_sub_state, g_rpm_ref);
+    //opened_loop_control(cnt);
+    closed_loop_control(0.043, 0.3, 0.001);
+   // theta_tilde=observer_theta_fl(0.001).theta_tilde;
 }
 
 static void AppTask10ms(void)
 {
-
+    g_state = get_state();
+    g_sub_state = 0; // 0: normal / 1: slow / 2: stop
 }
 static void AppTask20ms(void)
 {
+    g_rpm_ref = get_rpm_reference(g_state);
+
 
 }
 static void AppTask50ms(void)
 {
-//    JoystickValueForBT values = receive_data();
-//    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n", values.move_x, values.move_y, values.rotate_x, values.rotate_y);
+    //_usb_printf("theta_tilde(theta-theta_hat)=%lf\n",theta_tilde);
+    _usb_printf("g_ref_rpm.rl:%lf, g_cur_rpm.rl:%lf\n",g_ref_rpm.rl,g_cur_rpm.rl);
+//    float32 poten = get_potentiometer_data(); // 100% ~ 0%
+//    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
+//    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
+//    sint32 dist = get_tof_distance(); // mm value
+//
+//    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
+//            poten,
+//            dist,
+//            JM.x,
+//            JM.y,
+//            JR.x,
+//            JR.y);
+//
+//    set_wheelFL_dutycycle(poten*2-100);
+//    set_wheelFR_dutycycle(poten*2-100);
+//    set_wheelRL_dutycycle(poten*2-100);
+//    set_wheelRR_dutycycle(poten*2-100);
 
     JoystickValueSet joystick_data = get_bluetooth_joystick_data();
     send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
@@ -119,7 +144,7 @@ static void AppTask100ms(void)
 }
 static void AppTask250ms(void)
 {
-
+//    set_buzzer_toggle();
 }
 static void AppTask500ms(void)
 {
@@ -235,7 +260,6 @@ void init_appscheduling(void) /* use STM0 */
     /* enable interrupts again */
     IfxCpu_restoreInterrupts(interruptState);
 }
-
 
 
 

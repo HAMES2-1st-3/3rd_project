@@ -16,7 +16,10 @@
 #include "IfxVadc_Adc.h"
 #include "IfxPort.h"
 #include "IfxPort_PinMap.h"
+<<<<<<< HEAD
 
+=======
+>>>>>>> PID-30-wheel-rpm_ref-PI-
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/
@@ -64,8 +67,6 @@ typedef struct{
 /***********************************************************************/
 /*External Variable*/
 /***********************************************************************/
-//IFX_EXTERN App_VadcAutoScan g_VadcAutoScan;
-//extern volatile uint32_t adcDataResult[5];
 
 /***********************************************************************/
 /*Global Function Prototype*/

@@ -130,4 +130,3 @@ float32 get_potentiometer_data(void)
     return ((float32)(conversion_res.B.RESULT) * 100 / POTENTIOMETER_MAX_VALUE);
 }
 
-

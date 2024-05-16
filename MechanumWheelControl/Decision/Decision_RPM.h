@@ -3,11 +3,11 @@
  *
  *  Created on: 2024. 5. 10.
  *      Author: jaeeun
- *  필요 함수 및 기능
+ *  �븘�슂 �븿�닔 諛� 湲곕뒫
  *    float32 FUNC();
- *     - 가변저항의 값(0~1023)을 읽어 RPM 단위로 변환하여 return함
- *     - RPM 의 범위는 실험을 통해 설정하기
- *     -> Driver_Potentiometer.h 사용
+ *     - 媛�蹂����빆�쓽 媛�(0~1023)�쓣 �씫�뼱 RPM �떒�쐞濡� 蹂��솚�븯�뿬 return�븿
+ *     - RPM �쓽 踰붿쐞�뒗 �떎�뿕�쓣 �넻�빐 �꽕�젙�븯湲�
+ *     -> Driver_Potentiometer.h �궗�슜
  */
 #ifndef DECISION_DECISION_RPM_H_
 #define DECISION_DECISION_RPM_H_
@@ -32,5 +32,8 @@
 /*Global Function Prototype*/ 
 /***********************************************************************/
 void get_rpm_max(void);
+float32 get_rpm_reference(uint8 state);
 
+//추가
+void get_distance(uint8 state);
 #endif /* DECISION_DECISION_RPM_H_ */

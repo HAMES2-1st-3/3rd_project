@@ -160,4 +160,3 @@ sint32 get_tof_distance(void)
     }
     return tof_distance;
 }
-
