@@ -47,7 +47,7 @@
 - 이슈 만들어서 Number 확인하고, 커밋할때 앞에다가 #이슈번호 붙혀서 커밋하기!!
 - 브랜치도 이슈 Number 따라서 만들기( ex. feature/7 )
 
-## :white_check_mark: Coding Naming Convection
+## :white_check_mark: Coding Naming Convention
 
 1. Type 선언시 `_t` 붙이지 않기, AURIX Ifx 제공 자료형 사용
     * ex) `uint32`(O), `uint32_t`(X), `int8`(X), `sint8`(O), `float32`(O), `int`(X), `double`(X), 
