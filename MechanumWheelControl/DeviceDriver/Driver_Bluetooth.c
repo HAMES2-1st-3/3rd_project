@@ -53,7 +53,7 @@ static uint8 s_asclin2_tx_buf[ASC2_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 static uint8 s_asclin2_rx_buf[ASC2_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 
 
-JoystickValues s_joystick_values;
+static JoystickValues s_joystick_values;
 
 
 /*------------------------------------------------------Macros-------------------------------------------------------*/

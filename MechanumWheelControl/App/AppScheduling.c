@@ -10,6 +10,9 @@
 #include "IfxCpu_Irq.h"
 
 #include <Driver_Wheels.h>
+#include <Driver_Potentiometer.h>
+#include <Driver_Bluetooth.h>
+#include <Driver_USB.h>
 
 /********** control, Decision **********/
 #include <Control_Buzzer.h>
@@ -24,7 +27,7 @@
 //#include <Driver_Joystick.h>
 //#include <Driver_Potentiometer.h>
 //#include <Driver_ToF.h>
-//#include <Driver_USB.h>
+
 //#include <Driver_Bluetooth.h>
 //
 //#include <Driver_Buzzer.h>
@@ -63,7 +66,7 @@ struct
     IfxStm_CompareConfig stmConfig;         /**< \brief Stm Configuration structure */
     volatile uint8       LedBlink;          /**< \brief LED state variable */
     volatile uint32      counter;           /**< \brief interrupt counter */
-} g_stm; /**< \brief Stm global data */
+} s_stm0; /**< \brief Stm global data */
 
 struct
 {
@@ -81,19 +84,24 @@ uint32 g_counter_1ms = 0u;
 /***********************************************************************/
 /*User Variable*/
 /***********************************************************************/
+#define CLOSED_LOOP 0
 
-sint32 s_dist;
-uint32 s_rpm_max;
+static sint32 s_dist;
+static uint32 s_rpm_max;
 
-WheelRPMs s_wheel_rpms_ref;
-JoystickValues s_joystick_values;
+static WheelRPMs s_wheel_rpms_ref;
+static JoystickValues s_joystick_values;
 
-WheelTicks s_wheel_ticks;
-WheelRPMs s_wheel_rpms_measured;
-WheelRPMs s_wheel_rpms_error;
-WheelDutycycles s_wheel_dutycycles;
 
-BuzzerState s_buzzer_state;
+#if  CLOSED_LOOP == 1
+static WheelTicks s_wheel_ticks;
+static WheelRPMs s_wheel_rpms_measured;
+static WheelRPMs s_wheel_rpms_error;
+#endif
+
+static WheelDutycycles s_wheel_dutycycles;
+
+static BuzzerState s_buzzer_state;
 
 /***********************************************************************/
 /*Function*/ 
@@ -101,11 +109,18 @@ BuzzerState s_buzzer_state;
 
 static void AppTask1ms(void)
 {
+
+#if  CLOSED_LOOP == 1
     /* set wheel rpm measured, error, pid controll */
     s_wheel_ticks = get_wheel_ticks();
     s_wheel_rpms_measured = calc_wheel_rpms_measured(s_wheel_ticks, 0.001);
     s_wheel_rpms_error = calc_wheel_rpms_error(s_wheel_rpms_ref, s_wheel_rpms_measured);
     s_wheel_dutycycles = pid_controller(s_wheel_rpms_error);
+
+#else
+    s_wheel_dutycycles = open_loop_controller(s_wheel_rpms_ref);
+#endif
+    set_wheels_dutycycle(s_wheel_dutycycles);
 }
 
 static void AppTask10ms(void)
@@ -121,16 +136,31 @@ static void AppTask20ms(void)
 }
 static void AppTask50ms(void)
 {
-//    JoystickValues joystick_values = get_bluetooth_joystick_values();
+    /* value test */
 //    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
-//            joystick_values.move.x,
-//            joystick_values.move.y,
-//            joystick_values.rotate.x,
-//            joystick_values.rotate.y);
+//            s_joystick_values.move.x,
+//            s_joystick_values.move.y,
+//            s_joystick_values.rotate.x,
+//            s_joystick_values.rotate.y);
+
+//    send_usb_printf("rpm_fl: %f\n", s_wheel_rpms_ref.fl);
+//    send_usb_printf("rpm_fl: %f rpm_fr: %f rpm_rl: %f rpm_rr: %f\n",
+//            s_wheel_rpms_ref.fl,
+//            s_wheel_rpms_ref.rl,
+//            s_wheel_rpms_ref.fr,
+//            s_wheel_rpms_ref.rr);
+
+//    send_usb_printf("duty_fl: %f duty_fr: %f duty_rl: %f duty_rr: %f\n",
+//            s_wheel_dutycycles.fl,
+//            s_wheel_dutycycles.rl,
+//            s_wheel_dutycycles.fr,
+//            s_wheel_dutycycles.rr);
+
+
 
     /* set rpm_max */
     s_dist = get_tof_distance();
-    s_rpm_max = get_potentialmeter_value();
+    s_rpm_max = get_potentiometer_value(); // 0 ~ 4095
     s_rpm_max = get_max_rpm(s_dist, s_rpm_max);
 
     s_buzzer_state = set_buzzer_state(s_dist);
@@ -201,8 +231,8 @@ void stm0_comp_ir0_isr(void)
 {
     IfxCpu_enableInterrupts();
 
-    IfxStm_clearCompareFlag(g_stm.stmSfr, g_stm.stmConfig.comparator);
-    IfxStm_increaseCompare(g_stm.stmSfr, g_stm.stmConfig.comparator, 100000u);
+    IfxStm_clearCompareFlag(s_stm0.stmSfr, s_stm0.stmConfig.comparator);
+    IfxStm_increaseCompare(s_stm0.stmSfr, s_stm0.stmConfig.comparator, 100000u);
 
     g_counter_1ms++;
 
@@ -246,14 +276,14 @@ void init_appscheduling(void) /* use STM0 */
 
     IfxStm_enableOcdsSuspend(&MODULE_STM0);
 
-    g_stm.stmSfr = &MODULE_STM0;
-    IfxStm_initCompareConfig(&g_stm.stmConfig);
+    s_stm0.stmSfr = &MODULE_STM0;
+    IfxStm_initCompareConfig(&s_stm0.stmConfig);
 
-    g_stm.stmConfig.triggerPriority = ISR_PRIORITY_STMSR0;
-    g_stm.stmConfig.typeOfService   = IfxSrc_Tos_cpu0;
-    g_stm.stmConfig.ticks           = 100000u;
+    s_stm0.stmConfig.triggerPriority = ISR_PRIORITY_STMSR0;
+    s_stm0.stmConfig.typeOfService   = IfxSrc_Tos_cpu0;
+    s_stm0.stmConfig.ticks           = 100000u;
 
-    IfxStm_initCompare(g_stm.stmSfr, &g_stm.stmConfig);
+    IfxStm_initCompare(s_stm0.stmSfr, &s_stm0.stmConfig);
 
     /* enable interrupts again */
     IfxCpu_restoreInterrupts(interruptState);
