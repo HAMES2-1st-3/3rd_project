@@ -34,8 +34,6 @@
 
 extern IfxCpu_syncEvent g_cpuSyncEvent;
 
-extern JoystickValueForBT g_joystick_values;
-
 int core1_main(void)
 {
     IfxCpu_enableInterrupts();
@@ -54,7 +52,6 @@ int core1_main(void)
     while(1)
     {
         AppScheduling_cpu1();
-
     }
     return (1);
 }

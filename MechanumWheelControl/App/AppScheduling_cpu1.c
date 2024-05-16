@@ -4,32 +4,12 @@
 #include <AppMode.h>
 #include <AppScheduling_cpu1.h>
 
+#include <InterruptPriority.h>
+
 #include "IfxStm.h"
 #include "IfxCpu_Irq.h"
 
-/********** control, Decision **********/
-#include <Control_Buzzer.h>
-#include <Control_Motor.h>
-
-#include <Decision_RPM.h>
-#include <Decision_State.h>
-#include <Decision_Sub_State.h>
-/***************************************/
-
-/*******for test DD header files********/
-#include <Driver_Joystick.h>
-#include <Driver_Potentiometer.h>
-#include <Driver_ToF.h>
-#include <Driver_USB.h>
 #include <Driver_Bluetooth.h>
-
-#include <Driver_Buzzer.h>
-#include <Driver_WheelFL.h>
-#include <Driver_WheelFR.h>
-#include <Driver_WheelRL.h>
-#include <Driver_WheelRR.h>
-#include <InterruptPriority.h>
-/***************************************/
 
 
 /***********************************************************************/
@@ -75,8 +55,6 @@ struct
     uint8 scheduling_flag_500ms;
 }g_scheduling_info_1;
 
-extern JoystickValueForBT g_joystick_values;
-
 uint32 g_counter_1_1ms = 0u;
 
 /***********************************************************************/
@@ -89,26 +67,19 @@ uint32 g_counter_1_1ms = 0u;
 
 static void AppTask1ms(void)
 {
-    g_joystick_values = receive_data();
+    receive_bluetooth_joystick_data();
 }
 
 static void AppTask10ms(void)
 {
-//    _usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
-//                g_joystick_values.move_x,
-//                g_joystick_values.move_y,
-//                g_joystick_values.rotate_x,
-//                g_joystick_values.rotate_y);
+
 }
 static void AppTask20ms(void)
 {
 
-
 }
 static void AppTask50ms(void)
 {
-//    JoystickValueForBT values = receive_data();
-//    _usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n", values.move_x, values.move_y, values.rotate_x, values.rotate_y);
 
 }
 static void AppTask100ms(void)
@@ -121,7 +92,7 @@ static void AppTask250ms(void)
 }
 static void AppTask500ms(void)
 {
-//    toggle_buzzer();
+
 }
 static void AppNoTask()
 {

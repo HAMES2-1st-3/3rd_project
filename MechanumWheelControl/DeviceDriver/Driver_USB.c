@@ -55,7 +55,7 @@ static uint8 s_asclin3_rx_buf[ASC3_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 /***********************************************************************/
 
 
-void _usb_printf(pchar format,...)
+void send_usb_printf(pchar format,...)
 {
     char      message[USB_UART_MAX_PRINT_SIZE + 1];
     Ifx_SizeT count;

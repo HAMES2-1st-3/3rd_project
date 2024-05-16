@@ -12,26 +12,16 @@
 /*Include*/
 /***********************************************************************/
 #include "Ifx_Types.h"
-#include "IfxAsclin_Asc.h"
-#include "IfxPort.h"
-#include "InterruptPriority.h"
-#include "Driver_USB.h"
+#include "Driver_Joystick.h"
 
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/
-typedef struct{
-        uint32 move_x;
-        uint32 move_y;
-        uint32 rotate_x;
-        uint32 rotate_y;
-}JoystickValueForBT;
+
 /***********************************************************************/
 /*Define*/
 /***********************************************************************/
-#define ASC2_TX_BUFFER_SIZE 256
-#define ASC2_RX_BUFFER_SIZE 256
-#define ASC2_BAUDRATE 115200  // bluetooths's base baud rate
+
 
 /***********************************************************************/
 /*External Variable*/
@@ -42,10 +32,14 @@ typedef struct{
 /*Global Function Prototype*/
 /***********************************************************************/
 void init_bluetooth(void);
-void send_data(const char* data);
-void make_bluetooth_msg(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt);
-extern JoystickValueForBT receive_data(void);
+
+void send_bluetooth_joystick_data(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt);
+void receive_bluetooth_joystick_data(void);
+JoystickValueSet get_bluetooth_joystick_data(void);
+
+
+// config bluetooth function at AT command mode
 void init_bluetooth_master(void);
 void init_bluetooth_slave(void);
-void send_at_command(const char* command);
+
 #endif /* DEVICEDRIVER_DRIVER_BLUETOOTH_H_ */

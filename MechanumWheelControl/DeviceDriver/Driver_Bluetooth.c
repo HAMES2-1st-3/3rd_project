@@ -37,27 +37,47 @@
 #include <stdio.h>
 #include <stdarg.h>
 /*********************************************************************************************************************/
-
 /*Define*/
 /***********************************************************************/
 #define ASC2_TX_BUFFER_SIZE          256
 #define ASC2_RX_BUFFER_SIZE          256
 #define ASC2_BAUDRATE                115200  // bluetooths's base baud rate
 #define USB_UART_MAX_PRINT_SIZE (255)
-/***********************************************************************/
 
+
+/***********************************************************************/
 /*Variable*/
 /***********************************************************************/
 static IfxAsclin_Asc s_asclin2;
 static uint8 s_asclin2_tx_buf[ASC2_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 static uint8 s_asclin2_rx_buf[ASC2_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 
-JoystickValueForBT g_joystick;
-JoystickValueForBT g_joystick_values;
-/***********************************************************************/
 
-/*Function*/
-/***********************************************************************/
+JoystickValueSet s_joystick_values;
+
+
+/*------------------------------------------------------Macros-------------------------------------------------------*/
+/*********************************************************************************************************************/
+
+/*********************************************************************************************************************/
+/*-------------------------------------------------Global variables--------------------------------------------------*/
+/*********************************************************************************************************************/
+
+/*********************************************************************************************************************/
+/*--------------------------------------------Private Variables/Constants--------------------------------------------*/
+/*********************************************************************************************************************/
+
+/*********************************************************************************************************************/
+/*------------------------------------------------Function Prototypes------------------------------------------------*/
+/*********************************************************************************************************************/
+static  void send_data(pchar format);
+
+
+/*********************************************************************************************************************/
+/*---------------------------------------------Function Implementations----------------------------------------------*/
+/*********************************************************************************************************************/
+
+
 void init_bluetooth(void) {
     IfxAsclin_Asc_Config asc_conf;
 
@@ -96,7 +116,7 @@ void init_bluetooth(void) {
 }
 
 
-void make_bluetooth_msg(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
+void send_bluetooth_joystick_data(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
     char message[USB_UART_MAX_PRINT_SIZE + 1];
 
     snprintf(message, sizeof(message), "%lu %lu %lu %lu", x_mv, y_mv, x_rt, y_rt);
@@ -105,7 +125,66 @@ void make_bluetooth_msg(uint32 x_mv, uint32 y_mv, uint32 x_rt, uint32 y_rt) {
 }
 
 
-void send_data(pchar format) {
+void receive_bluetooth_joystick_data(void) {
+    char buffer[USB_UART_MAX_PRINT_SIZE + 1];
+    Ifx_SizeT count = 0;
+    char ch;
+
+    // Read characters into the buffer until we reach the end of the message or the buffer is full
+    do {
+        ch = IfxAsclin_Asc_blockingRead(&s_asclin2);
+        if (ch != '\r' && ch != '\n' && count < USB_UART_MAX_PRINT_SIZE) {
+            buffer[count++] = ch;
+        }
+    } while (ch != '\r' && ch != '\n' && count < USB_UART_MAX_PRINT_SIZE);
+
+    buffer[count] = '\0'; // Null-terminate the string
+
+    // Parse the received string into the JoystickValue structure
+    JoystickValueSet joystick;
+    if (sscanf(buffer, "%lu %lu %lu %lu", &joystick.move.x, &joystick.move.y, &joystick.rotate.x, &joystick.rotate.y) == 4) {
+        s_joystick_values = joystick; // Update the global joystick value
+    }
+}
+
+JoystickValueSet get_bluetooth_joystick_data(void) {
+    return s_joystick_values;
+}
+
+
+
+void init_bluetooth_master(void) {
+    send_data("AT"); // checking of connecting module
+    send_data("AT+ROLE=1"); // setting mode to Slave
+    send_data("AT+CMODE=0"); // pairing with specific module
+    send_data("AT+BIND=98d3:11:fc3f58"); // binding with slave's module of address
+    send_data("AT+LINK=98d3:11:fc3f58"); // linking with slave's module of address
+
+    /*if you want to set Master, USE following codes.
+
+      init_bluetooth_master();               <- in cpu0_Main.c
+
+      send_data("a");                        <- Wherever you want(But, needed to include header)
+
+      you can use the value of 'receivedChar'
+    */
+}
+
+void init_bluetooth_slave(void) {
+    send_data("AT"); // checking of connecting module
+    send_data("AT+ROLE=0"); // setting mode to Slave
+
+    /*if you want to set Slave, USE following codes.
+         *
+      init_bluetooth_slave();               <- in cpu0_Main.c
+
+      char receivedChar = receive_data();   <- Wherever you want(But, needed to include header)
+
+      you can use the value of 'receivedChar'
+    */
+}
+
+static void send_data(pchar format) {
     char      message[USB_UART_MAX_PRINT_SIZE + 1];
     Ifx_SizeT count;
     va_list   args;
@@ -129,66 +208,7 @@ void send_data(pchar format) {
     }
 }
 
-JoystickValueForBT receive_data(void) {
-    char buffer[USB_UART_MAX_PRINT_SIZE + 1];
-    Ifx_SizeT count = 0;
-    char ch;
 
-    // Read characters into the buffer until we reach the end of the message or the buffer is full
-    do {
-        ch = IfxAsclin_Asc_blockingRead(&s_asclin2);
-        if (ch != '\r' && ch != '\n' && count < USB_UART_MAX_PRINT_SIZE) {
-            buffer[count++] = ch;
-        }
-    } while (ch != '\r' && ch != '\n' && count < USB_UART_MAX_PRINT_SIZE);
-
-    buffer[count] = '\0'; // Null-terminate the string
-
-    // Parse the received string into the JoystickValue structure
-    JoystickValueForBT joystick;
-    if (sscanf(buffer, "%lu %lu %lu %lu", &joystick.move_x, &joystick.move_y, &joystick.rotate_x, &joystick.rotate_y) == 4) {
-        g_joystick = joystick; // Update the global joystick value
-    }
-
-    return g_joystick;
-}
-
-
-void send_at_command(pchar command) {
-    send_data(command);
-}
-
-void init_bluetooth_master(void) {
-    send_at_command("AT"); // checking of connecting module
-    send_at_command("AT+ROLE=1"); // setting mode to Slave
-    send_at_command("AT+CMODE=0"); // pairing with specific module
-    send_at_command("AT+BIND=98d3:11:fc3f58"); // binding with slave's module of address
-    send_at_command("AT+LINK=98d3:11:fc3f58"); // linking with slave's module of address
-
-    /*if you want to set Master, USE following codes.
-
-      init_bluetooth_master();               <- in cpu0_Main.c
-
-      send_data("a");                        <- Wherever you want(But, needed to include header)
-
-      you can use the value of 'receivedChar'
-    */
-
-}
-
-void init_bluetooth_slave(void) {
-    send_at_command("AT"); // checking of connecting module
-    send_at_command("AT+ROLE=0"); // setting mode to Slave
-
-    /*if you want to set Slave, USE following codes.
-         *
-      init_bluetooth_slave();               <- in cpu0_Main.c
-
-      char receivedChar = receive_data();   <- Wherever you want(But, needed to include header)
-
-      you can use the value of 'receivedChar'
-    */
-}
 
 IFX_INTERRUPT(asclin2_tx_ISR_bluetooth, 1, ISR_PRIORITY_ASCLIN2_TX);
 void asclin2_tx_ISR_bluetooth(void) {
@@ -204,23 +224,3 @@ IFX_INTERRUPT(asclin2_err_ISR_bluetooth, 1, ISR_PRIORITY_ASCLIN2_ER);
 void asclin2_err_ISR_bluetooth(void) {
     ;
 }
-/***********************************************************************/
-
-/*------------------------------------------------------Macros-------------------------------------------------------*/
-/*********************************************************************************************************************/
-
-/*********************************************************************************************************************/
-/*-------------------------------------------------Global variables--------------------------------------------------*/
-/*********************************************************************************************************************/
-
-/*********************************************************************************************************************/
-/*--------------------------------------------Private Variables/Constants--------------------------------------------*/
-/*********************************************************************************************************************/
-
-/*********************************************************************************************************************/
-/*------------------------------------------------Function Prototypes------------------------------------------------*/
-/*********************************************************************************************************************/
-
-/*********************************************************************************************************************/
-/*---------------------------------------------Function Implementations----------------------------------------------*/
-/*********************************************************************************************************************/

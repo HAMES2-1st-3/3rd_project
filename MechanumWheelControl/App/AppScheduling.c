@@ -78,8 +78,6 @@ struct
 
 uint32 g_counter_1ms = 0u;
 
-extern JoystickValueForBT g_joystick_values;
-
 /***********************************************************************/
 /*User Variable*/
 /***********************************************************************/
@@ -106,12 +104,14 @@ static void AppTask20ms(void)
 static void AppTask50ms(void)
 {
 //    JoystickValueForBT values = receive_data();
-//    _usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n", values.move_x, values.move_y, values.rotate_x, values.rotate_y);
-    _usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
-                    g_joystick_values.move_x,
-                    g_joystick_values.move_y,
-                    g_joystick_values.rotate_x,
-                    g_joystick_values.rotate_y);
+//    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n", values.move_x, values.move_y, values.rotate_x, values.rotate_y);
+
+    JoystickValueSet joystick_data = get_bluetooth_joystick_data();
+    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
+            joystick_data.move.x,
+            joystick_data.move.y,
+            joystick_data.rotate.x,
+            joystick_data.rotate.y);
 }
 static void AppTask100ms(void)
 {
