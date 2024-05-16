@@ -84,59 +84,60 @@ uint8 g_state;
 uint8 g_sub_state;
 float32 g_rpm_ref;
 float32 theta_tilde;
+estimate_state_var observer;
 uint32  cnt;
+
+static JoystickValueSet s_joystick_data;
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
+//
+const float32 kp_fl=0.1, ki_fl=1.0;
+const float32 kp_fr=0.043, ki_fr=0.3;
+const float32 kp_rl, ki_rl;
+const float32 kp_rr, ki_rr;
+
+//
 
 static void AppTask1ms(void)
 {
     cnt++;
     set_all_wheel(g_state, g_sub_state, g_rpm_ref);
     //opened_loop_control(cnt);
-    closed_loop_control(0.043, 0.3, 0.001);
-   // theta_tilde=observer_theta_fl(0.001).theta_tilde;
+    closed_loop_control(kp_fr, ki_fr, 0.001);
+
+
 }
 
 static void AppTask10ms(void)
 {
-    g_state = get_state();
+    s_joystick_data = get_bluetooth_joystick_data();
+    //g_state = get_state();
     g_sub_state = 0; // 0: normal / 1: slow / 2: stop
+    g_state = get_state(s_joystick_data);
+
 }
 static void AppTask20ms(void)
 {
-    g_rpm_ref = get_rpm_reference(g_state);
+    g_rpm_ref = get_rpm_reference(g_state,s_joystick_data);
+   // g_rpm_ref = get_rpm_reference(g_state);
 
+    //if u want to use observer for theta(output), use (1)(2)(3)
+    //observer=observer_theta_fl(0.02);  //(1)
+    //theta_tilde=observer.theta_tilde;  //(2)
 
 }
 static void AppTask50ms(void)
 {
-    //_usb_printf("theta_tilde(theta-theta_hat)=%lf\n",theta_tilde);
-    _usb_printf("g_ref_rpm.rl:%lf, g_cur_rpm.rl:%lf\n",g_ref_rpm.rl,g_cur_rpm.rl);
-//    float32 poten = get_potentiometer_data(); // 100% ~ 0%
-//    JoystickData JM = get_joystick_move_data(); // 100% ~ 0%
-//    JoystickData JR = get_joystick_rotate_data(); // 100% ~ 0%
-//    sint32 dist = get_tof_distance(); // mm value
-//
-//    _usb_printf("poten:%f, dist:%d, JoyM_x:%f, JoyM_y:%f, JoyR_x:%f, JoyR_y:%f\n",
-//            poten,
-//            dist,
-//            JM.x,
-//            JM.y,
-//            JR.x,
-//            JR.y);
-//
-//    set_wheelFL_dutycycle(poten*2-100);
-//    set_wheelFR_dutycycle(poten*2-100);
-//    set_wheelRL_dutycycle(poten*2-100);
-//    set_wheelRR_dutycycle(poten*2-100);
+    //send_usb_printf("theta_tilde(theta-theta_hat)=%lf\n",theta_tilde); //(3) you can see error close to zero
+    //send_usb_printf("g_ref_rpm.rl:%lf,g_cur_rpm.rl:%lf\n",g_ref_rpm.rl,g_cur_rpm.rl);
 
-    JoystickValueSet joystick_data = get_bluetooth_joystick_data();
-    send_usb_printf("move_x: %d move_y: %d rotate_x: %d rotate_y: %d\n",
-            joystick_data.move.x,
-            joystick_data.move.y,
-            joystick_data.rotate.x,
-            joystick_data.rotate.y);
+//    send_usb_printf("move_x:%u,move_y:%u,rotate_x:%u,rotate_y:%u\n",
+//            s_joystick_data.move.x,
+//            s_joystick_data.move.y,
+//            s_joystick_data.rotate.x,
+//            s_joystick_data.rotate.y);
+
 }
 static void AppTask100ms(void)
 {

@@ -3,16 +3,16 @@
  *
  *  Created on: 2024. 5. 10.
  *      Author: jaeeun
- *  필요 함수 및 기능
+ *  �븘�슂 �븿�닔 諛� 湲곕뒫
  *    int32 FUNC();
- *     - ToF센서를 통해 거리값을 입력 받아 sub_state를 판단하여 return함
+ *     - ToF�꽱�꽌瑜� �넻�빐 嫄곕━媛믪쓣 �엯�젰 諛쏆븘 sub_state瑜� �뙋�떒�븯�뿬 return�븿
  *     - sub_state: 0,1,2
- *     - distance 가 50cm 초과일 경우 normal(0)
- *     - distance 가 10cm 초과 && 50cm 이하일 경우 slow(1)
- *     - distance 가 10cm 이하일 경우 stop(2)
- *     - distance 가 음수와 같은 에러값일 경우 이전의 sub_state 리턴
+ *     - distance 媛� 50cm 珥덇낵�씪 寃쎌슦 normal(0)
+ *     - distance 媛� 10cm 珥덇낵 && 50cm �씠�븯�씪 寃쎌슦 slow(1)
+ *     - distance 媛� 10cm �씠�븯�씪 寃쎌슦 stop(2)
+ *     - distance 媛� �쓬�닔�� 媛숈� �뿉�윭媛믪씪 寃쎌슦 �씠�쟾�쓽 sub_state 由ы꽩
  *
- *     -> Driver_ToF.h 사용
+ *     -> Driver_ToF.h �궗�슜
  */
 
 
@@ -40,6 +40,8 @@ sint32 dist;
 /***********************************************************************/
 /*Function*/ 
 /***********************************************************************/
+//get sub state value from tof distance value
+//sub state => 0: normal / 1: slow / 2: stop
 uint8 get_sub_state(void){
     dist = get_tof_distance();
     if(dist >= 0 && dist <= 105) // Include +5mm error

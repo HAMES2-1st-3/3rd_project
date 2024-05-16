@@ -53,7 +53,7 @@ static uint8 s_asclin2_tx_buf[ASC2_TX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 static uint8 s_asclin2_rx_buf[ASC2_RX_BUFFER_SIZE + sizeof(Ifx_Fifo) + 8];
 
 
-JoystickValueSet s_joystick_values;
+static JoystickValueSet s_joystick_values;
 
 
 /*------------------------------------------------------Macros-------------------------------------------------------*/
@@ -142,9 +142,11 @@ void receive_bluetooth_joystick_data(void) {
 
     // Parse the received string into the JoystickValue structure
     JoystickValueSet joystick;
+
     if (sscanf(buffer, "%lu %lu %lu %lu", &joystick.move.x, &joystick.move.y, &joystick.rotate.x, &joystick.rotate.y) == 4) {
         s_joystick_values = joystick; // Update the global joystick value
     }
+
 }
 
 JoystickValueSet get_bluetooth_joystick_data(void) {

@@ -16,6 +16,10 @@
 /*Include*/ 
 /***********************************************************************/
 #include <Driver_Potentiometer.h>
+#include <Driver_Joystick.h>
+#include <Driver_USB.h>
+
+
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
@@ -32,8 +36,7 @@
 /*Global Function Prototype*/ 
 /***********************************************************************/
 void get_rpm_max(void);
-float32 get_rpm_reference(uint8 state);
-
-//추가
+float32 get_rpm_reference(uint8 state,JoystickValueSet s_joystick_data);//,JoystickValueSet s_joystick_data
 void get_distance(uint8 state);
+
 #endif /* DECISION_DECISION_RPM_H_ */

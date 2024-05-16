@@ -16,10 +16,6 @@
 #include "IfxVadc_Adc.h"
 #include "IfxPort.h"
 #include "IfxPort_PinMap.h"
-<<<<<<< HEAD
-
-=======
->>>>>>> PID-30-wheel-rpm_ref-PI-
 /***********************************************************************/
 /*Typedef*/
 /***********************************************************************/
@@ -49,7 +45,7 @@ typedef enum{
 }ADC_GROUP2;
 
 
-typedef struct{ //센싱 변수
+typedef struct{
         uint32 x;
         uint32 y;
 }JoystickValue;

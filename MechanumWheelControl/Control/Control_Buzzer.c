@@ -58,25 +58,26 @@
 /*********************************************************************************************************************/
 /*---------------------------------------------Function Implementations----------------------------------------------*/
 /*********************************************************************************************************************/
+//set buzzer mode on 250ms
 void set_buzzer_250ms(uint8 state,uint8 substate){
     if(state!=4){
         switch(substate){
             case 0://normal
-                set_buzzer_off();
+                set_buzzer_off();      //duty: 0
                 break;
             case 1://slow
-                set_buzzer_toggle();
+                set_buzzer_toggle();   // toggle between duty1 and duty2  => duty1: (1/2)*period , duty2 : 0
                 break;
             case 2://stop
-                set_buzzer_on();
+                set_buzzer_on();       //duty: (1/2)*period
                 break;
             default:  //?
-                set_buzzer_off();
+                set_buzzer_off();       //duty: 0
                 break;
         }
     }
     else{
-        set_buzzer_off();
+        set_buzzer_off();  //duty: 0
     }
 }
 

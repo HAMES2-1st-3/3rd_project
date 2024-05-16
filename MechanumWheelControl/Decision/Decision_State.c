@@ -3,19 +3,19 @@
  *
  *  Created on: 2024. 5. 10.
  *      Author: howon
- *  필요 함수 및 기능
+ *  �븘�슂 �븿�닔 諛� 湲곕뒫
  *    int32 FUNC();
- *     - Joystick의 가변저항 x, y의 범위에 따라 state를 판단하여 return함
- *     - state 0~8은 제어 방향, 9~10은 차량의 회전 방향을 나타냄
- *     - 제어 방향과 회전 방향 모두 하나의 조이스틱으로 설정하기 위해, 조이스틱의 스위치 입력 시 제어 방향과 회전 방향을 토글함
- *     - state 0~8 (8가지 제어 방향)
- *     - 0: 북서쪽  1: 북쪽  2: 북동쪽
- *     - 3: 서쪽   4: 가운데 5: 동쪽
- *     - 6: 남서쪽  7: 남쪽  8: 남동쪽
+ *     - Joystick�쓽 媛�蹂����빆 x, y�쓽 踰붿쐞�뿉 �뵲�씪 state瑜� �뙋�떒�븯�뿬 return�븿
+ *     - state 0~8�� �젣�뼱 諛⑺뼢, 9~10�� 李⑤웾�쓽 �쉶�쟾 諛⑺뼢�쓣 �굹���깂
+ *     - �젣�뼱 諛⑺뼢怨� �쉶�쟾 諛⑺뼢 紐⑤몢 �븯�굹�쓽 議곗씠�뒪�떛�쑝濡� �꽕�젙�븯湲� �쐞�빐, 議곗씠�뒪�떛�쓽 �뒪�쐞移� �엯�젰 �떆 �젣�뼱 諛⑺뼢怨� �쉶�쟾 諛⑺뼢�쓣 �넗湲��븿
+ *     - state 0~8 (8媛�吏� �젣�뼱 諛⑺뼢)
+ *     - 0: 遺곸꽌履�  1: 遺곸そ  2: 遺곷룞履�
+ *     - 3: �꽌履�   4: 媛��슫�뜲 5: �룞履�
+ *     - 6: �궓�꽌履�  7: �궓履�  8: �궓�룞履�
  *
- *     - state 9~10 (2가지 회전 방향)
- *     - 9: 서쪽(시계방향)    10: 동쪽(반시계방향)
- *     -> Driver_Joystick.h 사용
+ *     - state 9~10 (2媛�吏� �쉶�쟾 諛⑺뼢)
+ *     - 9: �꽌履�(�떆怨꾨갑�뼢)    10: �룞履�(諛섏떆怨꾨갑�뼢)
+ *     -> Driver_Joystick.h �궗�슜
  */
 
 /***********************************************************************/
@@ -42,14 +42,17 @@ static uint8 s_state=0;
 /***********************************************************************/
 /*Function*/
 /***********************************************************************/
-uint8 get_state(void)
+
+//get state value from two joystick value(move: 8 direction , rotate: 2 direction)
+uint8 get_state(JoystickValueSet joystick_data) //JoystickValueSet joystick_data
 {
 
     JoystickValue move;
     JoystickValue rotate;
-    move = get_joystick_move_value();
-    rotate = get_joystick_rotate_value();
-
+    move = joystick_data.move;
+    rotate = joystick_data.rotate;
+   // move=get_joystick_move_value();
+    //rotate=get_joystick_rotate_value();
     if(move.x <= 1570 && move.y <= 1570){
         s_state = 2;
     }
