@@ -73,16 +73,14 @@
     return s_joystick_values;
     }
 
-    ```
-   
+    ```   
 3. Funtion 네이밍 규칙: 수행동작_device이름_상세동작 
 * ex) send_usb_printf
 
-
-3. 지정자에 따라 접두어 붙이기
+4. 지정자에 따라 접두어 붙이기
       * static : `s_varname`
       * extern : `g_varname`
       * pointer : `p_varname`
 
-6. 변수 네이밍 규칙 : Snake Case convention 적용 - 예) `rpm_ref`, `sub_state`
-7. 함수 네이밍 규칙 : Snake Case convention 적용 - 예) `get_state()`
+5. 변수 네이밍 규칙 : Snake Case convention 적용 - 예) `rpm_ref`, `sub_state`
+6. 함수 네이밍 규칙 : Snake Case convention 적용 - 예) `get_state()`
