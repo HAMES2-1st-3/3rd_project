@@ -84,7 +84,7 @@ uint8 g_state;
 uint8 g_sub_state;
 float32 g_rpm_ref;
 float32 theta_tilde;
-estimate_state_var observer;
+estimate_state_var g_observer_fl;
 uint32  cnt;
 
 static JoystickValueSet s_joystick_data;
@@ -92,9 +92,9 @@ static JoystickValueSet s_joystick_data;
 /*Function*/ 
 /***********************************************************************/
 //
-const float32 kp_fl=0.1, ki_fl=1.0;
-const float32 kp_fr=0.043, ki_fr=0.3;
-const float32 kp_rl, ki_rl;
+const float32 kp_fl=0.06, ki_fl=0.4; //good
+const float32 kp_fr=0.043, ki_fr=0.3; //not bad
+const float32 kp_rl=0.2, ki_rl=0.1;
 const float32 kp_rr, ki_rr;
 
 //
@@ -104,32 +104,36 @@ static void AppTask1ms(void)
     cnt++;
     set_all_wheel(g_state, g_sub_state, g_rpm_ref);
     //opened_loop_control(cnt);
-    closed_loop_control(kp_fr, ki_fr, 0.001);
-
+    closed_loop_control(kp_fl,ki_fl,0.001);
 
 }
 
 static void AppTask10ms(void)
 {
     s_joystick_data = get_bluetooth_joystick_data();
-    //g_state = get_state();
+   // g_state = get_state();
     g_sub_state = 0; // 0: normal / 1: slow / 2: stop
+    //g_sub_state=get_sub_state(); //tof 할시
     g_state = get_state(s_joystick_data);
+
 
 }
 static void AppTask20ms(void)
 {
     g_rpm_ref = get_rpm_reference(g_state,s_joystick_data);
-   // g_rpm_ref = get_rpm_reference(g_state);
+    //g_rpm_ref = get_rpm_reference(g_state);
 
     //if u want to use observer for theta(output), use (1)(2)(3)
-    //observer=observer_theta_fl(0.02);  //(1)
-    //theta_tilde=observer.theta_tilde;  //(2)
+    g_observer_fl=observer_theta_fl(0.02);  //(1)
+   theta_tilde=g_observer_fl.theta_tilde;  //(2)
 
 }
 static void AppTask50ms(void)
 {
-    //send_usb_printf("theta_tilde(theta-theta_hat)=%lf\n",theta_tilde); //(3) you can see error close to zero
+    send_usb_printf("theta_tilde:%f\n",theta_tilde);
+    //send_usb_printf("g_ref_rpm.rl:%lf,g_cur_rpm.rl:%lf\n",g_ref_rpm.rl,g_cur_rpm.rl);
+//    send_usb_printf("g_ref_rpm.fl:%lf,g_cur_rpm.fl:%lf\n",g_ref_rpm.fl,g_cur_rpm.fl);
+//    send_usb_printf("theta_tilde:%f,current_hat:%f\n",theta_tilde,g_observer_fl.current_hat); //(3) you can see error close to zero
     //send_usb_printf("g_ref_rpm.rl:%lf,g_cur_rpm.rl:%lf\n",g_ref_rpm.rl,g_cur_rpm.rl);
 
 //    send_usb_printf("move_x:%u,move_y:%u,rotate_x:%u,rotate_y:%u\n",
@@ -145,7 +149,9 @@ static void AppTask100ms(void)
 }
 static void AppTask250ms(void)
 {
-//    set_buzzer_toggle();
+    //set_buzzer_250ms(g_state,g_sub_state); //부저 테스트시 필요
+    //set_buzzer_toggle();
+
 }
 static void AppTask500ms(void)
 {

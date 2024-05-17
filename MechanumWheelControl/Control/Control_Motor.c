@@ -35,8 +35,8 @@
 /***********************************************************************/
 #define RPM_MAX 5300.0
 #define e 2.718281
-#define CUT_DEFAULT 60
-#define CUT_FOR_RL  30
+#define CUT_DEFAULT 70
+#define CUT_FOR_RL  10
 /***********************************************************************/
 /*Typedef*/ 
 /***********************************************************************/
@@ -80,7 +80,7 @@ float32 R=8.4;
 float32 L=1.16;
 float32 B=0.00002;
 //estimate state variable
-estimate_state_var g_estimate_state_var;
+static estimate_state_var g_estimate_state_var;
 /***********************************************************************/
 
 /*Function*/ 
@@ -114,9 +114,9 @@ estimate_state_var observer_theta_fl(float32 Ts){ //frontLeft motor theta observ
     current_hat=current_hat_old+(-current_hat*(R/L)-omega_hat*(Kb/L)+(1/L)*get_vin(control_output.fl)+(L3)*theta_tilde)*Ts;
 
     //remove noises
-    theta_hat=LPF(theta_hat_old,theta_hat,100,Ts); //tuning plz
-    omega_hat=LPF(omega_hat_old,omega_hat,100,Ts);
-    current_hat=LPF(current_hat_old,current_hat,100,Ts);
+    theta_hat=LPF(theta_hat_old,theta_hat,30,Ts); //tuning plz
+    omega_hat=LPF(omega_hat_old,omega_hat,30,Ts);
+    current_hat=LPF(current_hat_old,current_hat,30,Ts);
 
     theta_hat_old=theta_hat;
     omega_hat_old=omega_hat;
@@ -132,33 +132,28 @@ estimate_state_var observer_theta_fl(float32 Ts){ //frontLeft motor theta observ
 //func for open-loop
 void opened_loop_control(uint32 ms)
 {
+    g_cur_rpm.fl=get_derivative_fl(get_wheelFL_tick(),0.001)*(60/22.0);
     set_wheelFL_dutycycle((float32)((float32)g_ref_rpm.fl/ RPM_MAX * 100.0));
-    set_wheelFR_dutycycle((float32)((float32)g_ref_rpm.fr/ RPM_MAX * 100.0));
+    //set_wheelFR_dutycycle((float32)((float32)g_ref_rpm.fr/ RPM_MAX * 100.0));
 //    float32 duty = ms/50000.0 * 100; // 10s -> 100duty
 //    if(duty >= 100){
 //        duty = 100;
 //    }
-    //g_cur_rpm.fl=get_derivative(get_wheelFL_tick(),0.001)*(60/22.0);
-    set_wheelRL_dutycycle((float32)((float32)g_ref_rpm.rl/ RPM_MAX * 100.0));
-    set_wheelRR_dutycycle((float32)((float32)g_ref_rpm.rr/ RPM_MAX * 100.0));
+
+    //set_wheelRL_dutycycle((float32)((float32)g_ref_rpm.rl/ RPM_MAX * 100.0));
+    //set_wheelRR_dutycycle((float32)((float32)g_ref_rpm.rr/ RPM_MAX * 100.0));
 }
 //func for closed-loop :  Kp ,Ki is fixed value
 void closed_loop_control(float32 kp, float32 ki, float32 Ts)
 {
     //get current rpm from encoder ticks
     // ticks -> derivative
-    g_cur_rpm.fl=get_derivative_fl(get_wheelFL_tick(),Ts)*(60/22.0); // multiply rpm scailing 60/22.0
+   g_cur_rpm.fl=get_derivative_fl(get_wheelFL_tick(),Ts)*(60/22.0); // multiply rpm scailing 60/22.0
 
     g_cur_rpm.fr=get_derivative_fr(get_wheelFR_tick(),Ts)*(60/22.0); // multiply rpm scailing
     g_cur_rpm.rl=get_derivative_rl(get_wheelRL_tick(),Ts)*(60/22.0); // multiply rpm scailing
     //g_cur_rpm.rl=get_derivative_rl(get_wheelFR_tick(),Ts)*(60/22.0); // multiply rpm scailing  bring fr data
     g_cur_rpm.rr=get_derivative_rr(get_wheelRR_tick(),Ts)*(60/22.0); // multiply rpm scailing
-
-    //watch only fl
-
-    //usb_printf("g_ref_rpm.fr:%lf, g_cur_rpm.fr:%lf\n", g_ref_rpm.fr,g_cur_rpm.fr);
-    //usb_printf("g_ref_rpm.rl:%lf, g_cur_rpm.rl:%lf\n", g_ref_rpm.rl,g_cur_rpm.rl);
-    //usb_printf("g_ref_rpm.rl:%lf, g_cur_rpm.rl:%lf\n", g_ref_rpm.rl,g_cur_rpm.rl);
 
     //PID
 
@@ -198,12 +193,14 @@ void closed_loop_control(float32 kp, float32 ki, float32 Ts)
     g_errors_old.rr_err_old=g_errors.rr_err;    //save
 
     //g_errors.rr_I_err=saturation(-130.0, 130.0, g_errors.rr_I_err); //limit error difference value
-
+    float32 kp_fr=0.043, ki_fr=0.3;
+    float32 kp_rl=0.4, ki_rl=0.1;
+    float32 kp_rr=0.05, ki_rr=0.4;
     // make output using Kp Ki
     control_output.fl = kp * (g_errors.fl_err) + ki * (g_errors.fl_I_err); //return
-    control_output.fr = kp * (g_errors.fr_err) + ki * (g_errors.fr_I_err);//return
-    control_output.rl = kp * (g_errors.rl_err) + ki * (g_errors.rl_I_err);//return
-    control_output.rr = kp * (g_errors.rr_err) + ki * (g_errors.rr_I_err);//return
+    control_output.fr = kp_fr * (g_errors.fr_err) + ki_fr * (g_errors.fr_I_err);//return
+    control_output.rl = kp_rl * (g_errors.rl_err) + ki_rl * (g_errors.rl_I_err);//return
+    control_output.rr = kp_rr * (g_errors.rr_err) + ki_rr * (g_errors.rr_I_err);//return
 
    // usb_printf("cont: %lf, fl_err:%lf,fl_i_err:%lf\n",control_output.fl,
   //          g_errors.fl_err, g_errors.fl_I_err);
@@ -304,7 +301,7 @@ static float32 get_derivative_fl(sint32 ticks,float32 Ts){
     static sint32 ticks_old=0;
     static float32 w_old=0;
     float32 w=0;
-    sint32 cutoff = CUT_DEFAULT;
+    sint32 cutoff = 70;
     //if(ticks > 0)
      //   cutoff = 10;
 
@@ -323,7 +320,7 @@ static float32 get_derivative_fr(sint32 ticks,float32 Ts){
     static sint32 ticks_old=0;
     static float32 w_old=0;
     float32 w=0;
-    sint32 cutoff = CUT_DEFAULT;
+    sint32 cutoff = 70;
 //   / if(ticks > 0)
    //     cutoff = 10;
 

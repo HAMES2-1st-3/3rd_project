@@ -65,8 +65,8 @@ float32 get_rpm_reference(uint8 state,JoystickValueSet s_joystick_data)//Joystic
     get_rpm_max();
     s_move = s_joystick_data.move;
     s_rotate = s_joystick_data.rotate;
-   // s_move=get_joystick_move_value();
-   // s_rotate=get_joystick_rotate_value();
+    //s_move=get_joystick_move_value();
+    //s_rotate=get_joystick_rotate_value();
 
     if(state ==1) //state 0,1,2
     {

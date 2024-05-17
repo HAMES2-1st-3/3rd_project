@@ -63,7 +63,7 @@ void init_buzzer(void)
     IfxGtm_Tom_Pwm_init(&s_tomDriver, &s_tom_config);                /* Initialize the GTM TOM                       */
     IfxGtm_Tom_Pwm_start(&s_tomDriver, TRUE);                       /* Start the PWM                                */
 
-    set_buzzer_intensity(50); // default intensity = 50%
+    set_buzzer_intensity(80); // default intensity = 50%
 }
 
 

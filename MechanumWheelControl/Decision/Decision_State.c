@@ -51,7 +51,7 @@ uint8 get_state(JoystickValueSet joystick_data) //JoystickValueSet joystick_data
     JoystickValue rotate;
     move = joystick_data.move;
     rotate = joystick_data.rotate;
-   // move=get_joystick_move_value();
+    //move=get_joystick_move_value();
     //rotate=get_joystick_rotate_value();
     if(move.x <= 1570 && move.y <= 1570){
         s_state = 2;
