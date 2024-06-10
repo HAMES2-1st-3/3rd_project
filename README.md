@@ -1,5 +1,5 @@
-# MechanumWheelControl
-> Mechanum Wheel-based Precision Control
+# MecanumWheelControl
+> Mecanum Wheel-based Precision Control
 
 <table>
  <tr>
